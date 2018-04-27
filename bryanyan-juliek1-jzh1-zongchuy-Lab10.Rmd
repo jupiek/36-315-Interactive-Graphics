@@ -1,0 +1,84 @@
+---
+title: "36-315 Lab 10, Spring 2018"
+author: "Austin Yu (zongchuy), Bryan Yan (bryanyan), Josh Huang (jzh1), Julie Kim (juliek1)"
+date: "Due Friday, April 27, 2018 (6:30pm) on Canvas"
+output: 
+  html_document:
+    toc:  true
+    toc_float:  true
+    code_folding:  show
+---
+
+
+##  Lab 10:  Interactive Graphics Group Project
+
+
+***
+***
+
+#  Problem 1
+
+(40 points)
+
+***Assignment**:  Read the Interactive Graphics Group Project file on Canvas. Choose your dataset for the project.  Dataset suggestions, resources, and requirements are provided on Canvas.*
+
+**What you have to turn in**:  
+
++  *A link to the dataset*
++  *A brief (no more than two paragraphs) description of the dataset, including number of rows, number of columns, explaining what each observation corresponds to, giving an overview of the columns/variables, etc.*
+
+***
+***
+
+#  Problem 2
+
+(30 points)
+
+***Assignment**:  Brainstorm at least three questions you'd like to answer with your dataset.*
+
+*(Remember from Lecture 23 that there are various kinds of interactive apps you could make: curated & personalized data exploration, sports analytics dashboards, journalistic reporting of a data analysis, "explorable explanations," etc.)*
+
+***What you have to turn in**:  At least three ideas of questions you can answer with your dataset, and how you might answer them using interactive statistical graphics.  This may include specific ideas about the types of graphs and interactions you'll create, or simply sentences like "What is the relationship between the age of shark attack victims and the year in which the shark attack occured?  Does this change depending on the gender of the victim?"*
+
+* Question 1:
+* Question 2:
+* Question 3:
+* ...
+
+***
+***
+
+
+#  Problem 3
+
+(30 points)
+
+***Assignment**:  Set up a ShinyApps.io account and host an example app.*
+
+*At least one of your teammates must create a free [ShinyApps.io](https://www.shinyapps.io/) account. Use your team name as the account username (unless one of you already has a ShinyApps account). Follow the instructions in this tutorial and deploy the demo Shiny app:*
+
++ *[https://shiny.rstudio.com/articles/shinyapps.html]*
+
+*Next, change the `titlePanel()` from "Diamonds Explorer" to the name of your team, and deploy the revised app.*
+
+*If needed, see this resource for extra support:*
+
++ *[http://docs.rstudio.com/shinyapps.io/]*
+
+**What you have to turn in**:  
+
++ https://power-gray.shinyapps.io/demo/
+
+
+***
+***
+
+
+
+#  That was easy.  What do we do next?
+
+(a)  Start working on your app!  See the Interactive Graphics Group Project file for more information. A complete first draft will be due as your Homework 12 on Wednesday 5/2/18.
+
+(b)  Schedule some times when you are all available to meet over the next few days to work on the project.
+
+(c)  Decide how you want to communicate and share code (e.g. with GitHub?) or other resources for the project.  
