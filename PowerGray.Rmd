@@ -13,19 +13,6 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r, message = FALSE, warning = FALSE}
-library(tidyverse)
-library(dplyr)
-library(plyr)
-library(shiny)
-library(rsconnect)
-library(ggplot2)
-
-data = read.csv("data.csv")
-
-dim(data)
-```
-
 **Context**
 
 Music streaming is ubiquitous. Currently, Spotify plays an important part on that. This dataset enable us to explore how artists and songs' popularity varies in time.
@@ -44,3 +31,40 @@ What are the signs of a song that gets into the top rank to stay?
 Do continents share same top ranking artists or songs?
 Are people listening to the very same top ranking songs on countries far away from each other?
 How long time does a top ranking song takes to get into the ranking of neighbor countries?
+
++ Load necessary libraries
++ Load data from `data.csv`
++ Check dimensions of the data, expecting a 3441197 x 7 dataframe
++ Return the first 5 rows
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(dplyr)
+library(plyr)
+library(shiny)
+library(rsconnect)
+library(ggplot2)
+library(igraph)
+library(ggraph)
+
+data = read.csv("data.csv")
+
+dim(data)
+head(data, 5)
+```
+
++ Write a `date.to.month` helper function, which takes in a date in the form YEAR-MONTH-DAY and converts it to a month
++ E.g. date.to.month(2017-01-26) returns January
++ Apply `date.to.month` across the `date` column of our data, creating a new column of months
+```{r}
+date.to.month = function(date) {
+  date = as.character(date)
+  month.numeric = as.numeric(unlist(strsplit(date, "-")))[2]
+  return(month.name[month.numeric])
+}
+
+data$Month = sapply(data$Date, date.to.month)
+```
+
+
+
+
