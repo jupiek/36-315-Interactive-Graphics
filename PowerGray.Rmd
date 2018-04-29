@@ -116,52 +116,27 @@ streams.by.country = ddply(data, .(Country), function(x) summary(x$Streams))
 # Summary statistics on top 200 streams, by continent
 streams.by.cont = ddply(data, .(Region), function(x) summary(x$Streams))
 
+# Total streams, world wide
+tot.streams = sum(as.numeric(data$Streams))
+# Summary statistics on top 200 streams, by country
+tot.streams.by.country = ddply(data, .(Country), function(x) sum(as.numeric(x$Streams)))
+# Summary statistics on top 200 streams, by continent
+tot.streams.by.cont = ddply(data, .(Region), function(x) sum(as.numeric(x$Streams)))
+
 # How many times did Artists end up in the top 200 rankings, world wide?
 artists = as.data.frame(table(data$Artist))
 # How many times did Artists end up in the top 200 rankings, by country?
 artists.by.country = ddply(data, .(Country), function(x) table(x$Artist))
 # How many times did Artists end up in the top 200 rankings, by continent?
 artists.by.cont = ddply(data, .(Region), function(x) table(x$Artist))
+
+colnames(tot.streams.by.country)[2] = "Total_Streams"
+country.data = left_join(tot.streams.by.country, artists.by.country, by = "Country")
 ```
 
 
 Graphics
 ===
-
-+ Create a network of countries 
-```{r, eval = FALSE}
-countries = data$Country
-country.graph <- graph_from_adjacency_matrix(as.dist(love_adjacency[,-1]))
-
-ggraph(LA_graph, layout = "kk") +
-  geom_edge_link() +
-  geom_node_label(aes(label = actor_names), size = 2) +
-  labs(title = "Network of Love Actually Characters",
-       x = "", y = "") +
-  theme(axis.text.x = element_blank(),
-        axis.text.y = element_blank())
-```
-
-+ Create a map base of the world
-```{r, eval = FALSE}
-center = 160
-worldmap = map_data("world")
-
-ggplot() + 
-  geom_polygon(worldmap, aes(x = 29.4873047, y = 27.0591258)) +
-  scale_y_continuous(limits = c(-85, 85))
-
-map.base = get_map(location = c(29.4873047, 27.0591258),
-                   source = "google")
-
-map.base = get_map(location = c(lon = -122.350061, lat = 37.778786),
-                    source = "google",
-                    maptype = "roadmap")
-
-map = ggmap(map.base) + 
-  scale_x_continuous(limits = c(-100, 180)) + 
-  
-```
 
 
 
