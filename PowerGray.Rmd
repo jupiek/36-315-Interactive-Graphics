@@ -13,6 +13,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+Data Overview
+===
 **Context**
 
 Music streaming is ubiquitous. Currently, Spotify plays an important part on that. This dataset enable us to explore how artists and songs' popularity varies in time.
@@ -32,6 +35,16 @@ Do continents share same top ranking artists or songs?
 Are people listening to the very same top ranking songs on countries far away from each other?
 How long time does a top ranking song takes to get into the ranking of neighbor countries?
 
+**Questions**
+
+1) Do people listen to the same songs even if the country is far away from each other?
+2) What is the most popular song based on region?
+3) How long does a particular song stay in top 5/10/20?
+4) Given a top ranking song in a particular region, how long before a neighboring country has the same song in its top rankings?
+
+
+Code
+===
 + Load necessary libraries
 + Load data from `data.csv`
 + Check dimensions of the data, expecting a 3441197 x 7 dataframe
@@ -45,6 +58,9 @@ library(rsconnect)
 library(ggplot2)
 library(igraph)
 library(ggraph)
+library(ggmap)
+library(maps)
+library(sp)
 
 data = read.csv("data.csv")
 
@@ -52,9 +68,9 @@ dim(data)
 head(data, 5)
 ```
 
-+ Write a `date.to.month` helper function, which takes in a date in the form YEAR-MONTH-DAY and converts it to a month
++ Write a `date.to.month()` helper function, which takes in a date in the form YEAR-MONTH-DAY and converts it to a month
 + E.g. date.to.month(2017-01-26) returns January
-+ Apply `date.to.month` across the `date` column of our data, creating a new column of months
++ Apply `date.to.month()` across the `Date` column of our data, creating a new column `Month`
 ```{r}
 date.to.month = function(date) {
   date = as.character(date)
@@ -63,6 +79,22 @@ date.to.month = function(date) {
 }
 
 data$Month = sapply(data$Date, date.to.month)
+```
+
++ Create a vector of countries based off of the country codes that we have in our `Region` column
++ Write a `code.to.country()` function that takes in a country code and returns the country
++ E.g. `code.to.country("ec")` returns "Ecuador"
++ Apply `code.to.country()`across the `Region` column of our data, creating a new column `Country`
+```{r}
+countries = unique(data$Region)
+names(countries) = c("Ecuador", "France", "Argentina", "Finland", "Norway", "Italy", "Lithuania", "Philippines", "Taiwan", "New Zealand", "Estonia", "Turkey", "United States of America", "El Salvador", "Costa Rica", "Germany", "Chile", "Japan", "Brazil", "Honduras", "Guatemala", "Switzerland", "Hungary", "Canada", "Peru", "Belgium", "Malaysia", "Denmark", "Bolivia", "Poland", "Austria", "Portugal", "Sweden", "Mexico", "Panama", "Uruguay", "Iceland", "Spain", "Czech Republic", "Ireland", "Netherlands", "Slovakia", "Colombia", "Singapore", "Indonesia", "Dominican Republic", "Luxembourg", "United Kingdom", "World", "Paraguay", "Australia", "Latvia", "Greece", "Hong Kong")
+
+code.to.country = function(code) {
+  code = as.character(code)
+  return(names(countries)[which(countries == code)])
+}
+
+data$Country = sapply(data$Region, code.to.country)
 ```
 
 
