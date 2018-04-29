@@ -14,36 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-Data Overview
-===
-**Context**
-
-Music streaming is ubiquitous. Currently, Spotify plays an important part on that. This dataset enable us to explore how artists and songs' popularity varies in time.
-
-**Content**
-
-This dataset contains the daily ranking of the 200 most listened songs in 53 countries from 2017 and 2018 by Spotify users. It contains more than 2 million rows, which comprises 6629 artists, 18598 songs for a total count of one hundred five billion streams count.
-
-The data spans from 1st January 2017 to 9th January 2018 and will be kept up-to-date on following versions. It has been collected from Spotify's regional chart data.
-
-**Inspiration**
-
-Can you predict what is the rank position or the number of streams a song will have in the future?
-How long does songs "resist" on the top 3, 5, 10, 20 ranking?
-What are the signs of a song that gets into the top rank to stay?
-Do continents share same top ranking artists or songs?
-Are people listening to the very same top ranking songs on countries far away from each other?
-How long time does a top ranking song takes to get into the ranking of neighbor countries?
-
-**Questions**
-
-1) Do people listen to the same songs even if the country is far away from each other?
-2) What is the most popular song based on region?
-3) How long does a particular song stay in top 5/10/20?
-4) Given a top ranking song in a particular region, how long before a neighboring country has the same song in its top rankings?
-
-
-Code
+Load-In
 ===
 + Load necessary libraries
 + Load data from `data.csv`
@@ -67,6 +38,10 @@ data = read.csv("data.csv")
 dim(data)
 head(data, 5)
 ```
+
+
+Data Manipulation
+===
 
 + Write a `date.to.month()` helper function, which takes in a date in the form YEAR-MONTH-DAY and converts it to a month
 + E.g. date.to.month(2017-01-26) returns January
@@ -95,6 +70,97 @@ code.to.country = function(code) {
 }
 
 data$Country = sapply(data$Region, code.to.country)
+```
+
++ Create a vector of continents based off of the countries that we have in our `Country` column
++ Write a `country.to.continent()` function that takes in a country code and returns the continent
++ E.g. `country.to.continent("Ecuador")` returns "South America"
++ Apply `country.to.continent()`across the `Country` column of our data, replacing the column `Region`
+```{r}
+world = c("World")
+asia = c("Philippines", "Taiwan", "Japan", "Malaysia", "Singapore", "Indonesia", 
+         "Hong Kong")
+europe = c("France", "Finland", "Norway", "Italy", "Lithuania", "Estonia", 
+           "Turkey", "Germany", "Switzerland", "Hungary", "Belgium", "Denmark", 
+           "Poland", "Austria", "Portugal", "Sweden", "Iceland", "Spain", 
+           "Czech Republic", "Ireland", "Netherlands", "Slovakia", "Luxembourg", 
+           "United Kingdom", "Latvia", "Greece")
+northamerica = c("United States of America", "Canada", "Mexico")
+centralamerica = c("El Salvador", "Costa Rica", "Honduras", "Guatemala", 
+                   "Panama", "Dominican Republic")
+southamerica = c("Ecuador", "Argentina", "Chile", "Brazil", "Peru", "Bolivia", 
+                 "Uruguay", "Colombia", "Paraguay")
+oceania = c("New Zealand", "Australia")
+
+country.to.continent = function(country) {
+  country = as.character(country)
+  if (country %in% world) return("World")
+  if (country %in% asia) return("Asia")
+  if (country %in% europe) return("Europe")
+  if (country %in% northamerica) return("North America")
+  if (country %in% centralamerica) return("Central America")
+  if (country %in% southamerica) return("South America")
+  if (country %in% oceania) return("Oceania")
+  return(NA)
+}
+
+data$Region = sapply(data$Country, country.to.continent)
+```
+
++ Statistical summaries to get a sense of the data
+```{r}
+# Summary statistics on top 200 streams, world wide
+streams = summary(data$Streams)
+# Summary statistics on top 200 streams, by country
+streams.by.country = ddply(data, .(Country), function(x) summary(x$Streams))
+# Summary statistics on top 200 streams, by continent
+streams.by.cont = ddply(data, .(Region), function(x) summary(x$Streams))
+
+# How many times did Artists end up in the top 200 rankings, world wide?
+artists = as.data.frame(table(data$Artist))
+# How many times did Artists end up in the top 200 rankings, by country?
+artists.by.country = ddply(data, .(Country), function(x) table(x$Artist))
+# How many times did Artists end up in the top 200 rankings, by continent?
+artists.by.cont = ddply(data, .(Region), function(x) table(x$Artist))
+```
+
+
+Graphics
+===
+
++ Create a network of countries 
+```{r, eval = FALSE}
+countries = data$Country
+country.graph <- graph_from_adjacency_matrix(as.dist(love_adjacency[,-1]))
+
+ggraph(LA_graph, layout = "kk") +
+  geom_edge_link() +
+  geom_node_label(aes(label = actor_names), size = 2) +
+  labs(title = "Network of Love Actually Characters",
+       x = "", y = "") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank())
+```
+
++ Create a map base of the world
+```{r, eval = FALSE}
+center = 160
+worldmap = map_data("world")
+
+ggplot() + 
+  geom_polygon(worldmap, aes(x = 29.4873047, y = 27.0591258)) +
+  scale_y_continuous(limits = c(-85, 85))
+
+map.base = get_map(location = c(29.4873047, 27.0591258),
+                   source = "google")
+
+map.base = get_map(location = c(lon = -122.350061, lat = 37.778786),
+                    source = "google",
+                    maptype = "roadmap")
+
+map = ggmap(map.base) + 
+  scale_x_continuous(limits = c(-100, 180)) + 
+  
 ```
 
 
