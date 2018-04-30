@@ -7,6 +7,7 @@ output:
     toc:  true
     toc_float:  true
     code_folding:  show
+runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
@@ -21,6 +22,7 @@ Load-In
 + Check dimensions of the data, expecting a 3441197 x 7 dataframe
 + Return the first 5 rows
 ```{r, message = FALSE, warning = FALSE}
+setwd('/Users/bryanyan/Desktop/cmusenior/spring18/36-315/final/36-315-Interactive-Graphics')
 library(tidyverse)
 library(dplyr)
 library(plyr)
@@ -32,6 +34,7 @@ library(ggraph)
 library(ggmap)
 library(maps)
 library(sp)
+library(scales)
 
 data = read.csv("data.csv")
 
@@ -138,6 +141,70 @@ country.data = left_join(tot.streams.by.country, artists.by.country, by = "Count
 Graphics
 ===
 
-
-
-
+```{r}
+shinyApp(
+  
+  ui = fluidPage(
+    inputPanel(
+      selectInput("country", label = "Country",
+                  choices = unique(data$Country), 
+                  selected = "United States of America"),
+      
+      selectInput("country2", label = "Country 2",
+                  choices = unique(data$Country),
+                  selected = "Canada"),
+      
+      textInput("song", label = "Song Name", 
+                     value = "rockstar"),
+      
+      textInput("artist", label = "Artist Name", 
+                     value = "Post Malone")
+    ),
+    
+    plotOutput("top_ranking_time")
+  ),
+  
+  server = function(input, output) {
+    
+    dataSub <- reactive({
+        if (input$song == "") {
+          chosenSong <- " "
+        }
+        else {
+          chosenSong <- input$song 
+        }
+        subset(data, Track.Name == chosenSong &
+               Artist == input$artist &
+              (Country == input$country | Country == input$country2))
+    })
+    
+    output$top_ranking_time <- renderPlot({
+      subsetOfData <- dataSub()
+      if (nrow(subsetOfData) == 0) {
+        ggplot() + 
+          annotate("text", 
+                   x = 4, y = 25, size = 8, label = "Song/Artist Not Found") + 
+          theme_void() +
+          labs(x = NULL, y = NULL)
+      }
+      else {
+        ggplot(subsetOfData, aes(x = as.Date(Date), y = Streams, 
+                                 color = Country, group = Country)) +
+          scale_x_date(date_labels = "%b %y") +
+          scale_y_continuous(labels = comma) +
+          geom_point() +
+          geom_line() +
+          labs(title = "Song Streams by Country Over Time",
+                x = "Date",
+                y = "Number of Streams") +
+          theme(axis.title.y = 
+                  element_text(margin = margin(r = 20)),
+                axis.title.x =
+                  element_text(margin = margin(t = 20)))
+      }
+    })
+  },
+  
+  options = list(height = 550)
+)
+```
