@@ -430,7 +430,7 @@ shinyApp(
             choices = c("North America", "South America", "Central America",
                   "Asia", "Europe", "Oceania"), selected = "North America"),
       
-      sliderInput("top_n", label = "Top _ songs by days on top 5",
+      sliderInput("top_n", label = "Top n songs by days on top 5",
                   min = 5, max = 50, value = 10, step = 5)
     ),
     
@@ -600,13 +600,20 @@ shinyApp(
             choices = unique(top.songs.na.grouped$Artist), 
             selected = "Ed Sheeran")
             
-      
     ),
     
     plotlyOutput("top_artist_prop_plot")
   ),
   
-  server = function(input, output) {
+  server = function(input, output, session) {
+    observe({
+      x <- input$region
+      updateSelectInput(session, "artist", 
+          choices = unique(eval(parse(text = paste("top.songs.", 
+                input$region, ".grouped$Artist", sep = "")))), 
+                  selected = "Ed Sheeran")
+    })
+    
     output$top_artist_prop_plot <- renderPlotly({
       p <- ggplot(eval(parse(text = paste("top.songs.", input$region, ".grouped",
               sep = "")))[eval(parse(text = paste("top.songs.", 
