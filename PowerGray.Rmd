@@ -20,9 +20,6 @@ knitr::opts_chunk$set(echo = TRUE)
 Load-In
 ===
 + Load necessary libraries
-+ Load data from `data.csv`
-+ Check dimensions of the data, expecting a 3441197 x 7 dataframe
-+ Return the first 5 rows
 ```{r, message = FALSE, warning = FALSE}
 library(tidyverse)
 library(dplyr)
@@ -34,12 +31,15 @@ library(igraph)
 library(ggraph)
 library(ggmap)
 library(maps)
-<<<<<<< HEAD
 library(sp)
 library(plotly)
-=======
->>>>>>> 69f8b5780f5bd8519776fe7c66b2fa3e0ccc7c35
+library(scales)
+```
 
++ Load data from `data.csv`
++ Check dimensions of the data, expecting a 3441197 x 7 dataframe
++ Return the first 5 rows
+```{r}
 data = read.csv("data.csv")
 
 dim(data)
@@ -175,6 +175,203 @@ n.tracks.by.cont = ddply(tracks.by.cont, .(Region),
                           function(x) sum(x != 0))
 ```
 
+Graphics
+===
+
+Set Up for Graph 1
+---
++ Create the `country.data` dataframe that consolidates the number of streams, tracks and artists of each country into one table
++ Use `map_data` to add goegraphical data for our map graphic 
+```{r}
+data.asia = data[which(data$Region == "Asia"),]
+data.europe = data[which(data$Region == "Europe"),]
+data.northamerica = data[which(data$Region == "North America"),]
+data.centralamerica = data[which(data$Region == "Central America"),] 
+data.southamerica = data[which(data$Region == "South America"),] 
+data.oceania = data[which(data$Region == "Oceania"),] 
+
+colnames(tot.streams.by.country)[2] = "Total_Streams"
+country.data = tot.streams.by.country
+
+colnames(n.artists.by.country)[2] = "N_Artists"
+country.data = left_join(country.data, n.artists.by.country, 
+                         by = "Country")
+
+colnames(n.tracks.by.country)[2] = "N_Tracks"
+country.data = left_join(country.data, n.tracks.by.country, 
+                         by = "Country")
+
+country.data = left_join(country.data, artists.by.country, 
+                         by = "Country")
+
+coords = map_data("world")
+coords$Country = coords$region
+coords = coords[,c("Country", "long", "lat", "group")]
+
+country.data = left_join(country.data, coords, by = c("Country"))
+```
+
+Graph 1
+---
+Compare the Countries by:
+
+    + Number of streams 
+    + Number of top tracks listened to 
+    + Number of top artists listeed to (do they tend to listen to more top tracks by the same artists)
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+shinyApp(
+  ui = fluidPage(
+    inputPanel(
+       radioButtons("variable", label = "Fill Variable:",
+                   choiceNames = c("Number of Streams", "Number of Tracks", 
+                                   "Number of Artists"),
+                   choiceValues = c("Total_Streams", "N_Tracks", "N_Artists"))
+    ),
+    plotlyOutput("world_map")
+  ),
+  
+  server = function(input, output) {
+    output$world_map <- renderPlotly({
+      
+      rplot = ggplot() + 
+        geom_polygon(data = coords, aes(x = long, y = lat, group = group), 
+                     fill = "white") +
+        geom_polygon(data = country.data, aes_string(x = "long", y = "lat", 
+                                                     group = "group",
+                                                     fill = input$variable)) + 
+        scale_fill_gradient2(high = "brown", low = "purple", mid = "white") +
+        labs(title = "Top 200 ranking Spotify tracks worldwide",
+             x = "", 
+             y = "") +
+        theme(axis.text.x = element_blank(),
+              axis.text.y = element_blank())
+      
+      if(input$variable == "Total_Streams") 
+        rplot = rplot + labs(fill = "Number of Streams")
+      if(input$variable == "N_Tracks") 
+        rplot = rplot + labs(fill = "Number of Tracks")
+      if(input$variable == "N_Artists") 
+        rplot = rplot + labs(fill = "Number of Artists")
+      
+      ggplotly(rplot)
+      
+      })
+  },
+  options = list(height = 550)
+)
+```
+
+Graph 2: INCOMPLETE
+---
+```{r, eval = FALSE, include = FALSE}
+shinyApp(
+  
+  ui = fluidPage(
+    inputPanel(
+      selectInput("continent", label = "Continent:",
+                  choices = c("Asia", "Europe", "Central America", 
+                              "North America", "Oceania", "South America", 
+                              "World"), 
+                  selected = "Asia"),
+      
+      selectInput("artist", label = "Top 200 Artist:",
+                  choices = artists, selected = "-M-")
+    ),
+    
+    plotOutput("cont_map")
+  ),
+  
+  server = function(input, output) {
+    output$cont_map <- renderPlot({
+      
+      ggplot() + 
+        geom_polygon(data = coords, aes(x = long, y = lat, group = group), 
+                     fill = "white") + 
+        geom_polygon(data = country.data, aes(x = long, y = lat, group = group,
+                                              fill = Total_Streams)) +
+        scale_color_gradient()
+
+    })
+  }
+  
+)
+```
+
+GRAPH 3: COMPLETE (Can Add More Features)
+---
+```{r}
+shinyApp(
+  
+  ui = fluidPage(
+    inputPanel(
+      selectInput("country", label = "Country",
+                  choices = unique(data$Country), 
+                  selected = "United States of America"),
+      
+      selectInput("country2", label = "Country 2",
+                  choices = unique(data$Country),
+                  selected = "Canada"),
+      
+      textInput("song", label = "Song Name", 
+                     value = "rockstar"),
+      
+      textInput("artist", label = "Artist Name", 
+                     value = "Post Malone")
+    ),
+    
+    plotOutput("top_ranking_time")
+  ),
+  
+  server = function(input, output) {
+    
+    dataSub <- reactive({
+        if (input$song == "") {
+          chosenSong <- " "
+        }
+        else {
+          chosenSong <- input$song 
+        }
+        subset(data, Track.Name == chosenSong &
+               Artist == input$artist &
+              (Country == input$country | Country == input$country2))
+    })
+    
+    output$top_ranking_time <- renderPlot({
+      subsetOfData <- dataSub()
+      if (nrow(subsetOfData) == 0) {
+        ggplot() + 
+          annotate("text", 
+                   x = 4, y = 25, size = 8, label = "Song/Artist Not Found") + 
+          theme_void() +
+          labs(x = NULL, y = NULL)
+      }
+      else {
+        ggplot(subsetOfData, aes(x = as.Date(Date), y = Streams, 
+                                 color = Country, group = Country)) +
+          scale_x_date(date_labels = "%b %y") +
+          scale_y_continuous(labels = comma) +
+          geom_point() +
+          geom_line() +
+          labs(title = "Song Streams by Country Over Time",
+                x = "Date",
+                y = "Number of Streams") +
+          theme(axis.title.y = 
+                  element_text(margin = margin(r = 20)),
+                axis.title.x =
+                  element_text(margin = margin(t = 20)))
+      }
+    })
+  },
+  
+  options = list(height = 550)
+)
+```
+
+
+Set Up for Graph 4
+---
++ 
++  
 
 ```{r}
 asia.data <- data[data$Region == "Asia",]
@@ -222,6 +419,8 @@ cum.table$'Oceania' <- table.oceania
 ```
 
 
+GRAPH 4:
+---
 ```{r plotly_in_shiny, echo=FALSE, warning=FALSE, message=FALSE}
 shinyApp(
   
@@ -255,6 +454,11 @@ shinyApp(
   options = list(height = 550)
 )
 ```
+
+Set Up for Graph 5
+---
++ 
++ 
 
 ```{r}
 top.artists.asia <- arrange(ddply(top.songs.asia, .(Artist), 
@@ -379,7 +583,8 @@ colnames(top.songs.oceania.grouped)[2] = "Streams"
 
 ```
 
-
+GRAPH 5
+---
 ```{r plotly_in_shiny, echo=FALSE, warning=FALSE, message=FALSE}
 shinyApp(
   
@@ -411,200 +616,6 @@ shinyApp(
                  width = .5)
       
       ggplotly(p)
-    })
-  },
-  
-  options = list(height = 550)
-)
-```
-
-Graphics
-===
-
-Set Up for Graph 1
----
-+ Create the `country.data` dataframe that consolidates the number of streams, tracks and artists of each country into one table
-+ Use `map_data` to add goegraphical data for our map graphic 
-```{r}
-data.asia = data[which(data$Region == "Asia"),]
-data.europe = data[which(data$Region == "Europe"),]
-data.northamerica = data[which(data$Region == "North America"),]
-data.centralamerica = data[which(data$Region == "Central America"),] 
-data.southamerica = data[which(data$Region == "South America"),] 
-data.oceania = data[which(data$Region == "Oceania"),] 
-
-colnames(tot.streams.by.country)[2] = "Total_Streams"
-country.data = tot.streams.by.country
-
-colnames(n.artists.by.country)[2] = "N_Artists"
-country.data = left_join(country.data, n.artists.by.country, 
-                         by = "Country")
-
-colnames(n.tracks.by.country)[2] = "N_Tracks"
-country.data = left_join(country.data, n.tracks.by.country, 
-                         by = "Country")
-
-country.data = left_join(country.data, artists.by.country, 
-                         by = "Country")
-
-coords = map_data("world")
-coords$Country = coords$region
-coords = coords[,c("Country", "long", "lat", "group")]
-
-country.data = left_join(country.data, coords, by = c("Country"))
-```
-
-Graph 1
----
-Compare the Countries by:
-
-    + Number of streams 
-    + Number of top tracks listened to 
-    + Number of top artists listeed to (do they tend to listen to more top tracks by the same artists)
-```{r, echo = FALSE, warning = FALSE, message = FALSE}
-shinyApp(
-  ui = fluidPage(
-    inputPanel(
-       radioButtons("variable", label = "Fill Variable:",
-                   choiceNames = c("Number of Streams", "Number of Tracks", 
-                                   "Number of Artists"),
-                   choiceValues = c("Total_Streams", "N_Tracks", "N_Artists"))
-    ),
-    plotOutput("world_map")
-  ),
-  
-  server = function(input, output) {
-    output$world_map <- renderPlot({
-      
-      rplot = ggplot() + 
-        geom_polygon(data = coords, aes(x = long, y = lat, group = group), 
-                     fill = "white") +
-        geom_polygon(data = country.data, aes_string(x = "long", y = "lat", 
-                                                     group = "group",
-                                                     fill = input$variable)) +
-        scale_fill_gradient2(high = "brown", low = "purple", mid = "white") +
-        labs(title = "Top 200 ranking Spotify tracks worldwide",
-             x = "", 
-             y = "") +
-        theme(axis.text.x = element_blank(),
-              axis.text.y = element_blank())
-      
-      if(input$variable == "Total_Streams") 
-        rplot = rplot + labs(fill = "Number of Streams")
-      if(input$variable == "N_Tracks") 
-        rplot = rplot + labs(fill = "Number of Tracks")
-      if(input$variable == "N_Artists") 
-        rplot = rplot + labs(fill = "Number of Artists")
-      
-      rplot
-      
-      })
-  },
-  options = list(height = 550)
-)
-```
-
-Graph 2: INCOMPLETE
----
-
-```{r, eval = FALSE, include = FALSE}
-shinyApp(
-  
-  ui = fluidPage(
-    inputPanel(
-      selectInput("continent", label = "Continent:",
-                  choices = c("Asia", "Europe", "Central America", 
-                              "North America", "Oceania", "South America", 
-                              "World"), 
-                  selected = "Asia"),
-      
-      selectInput("artist", label = "Top 200 Artist:",
-                  choices = artists, selected = "-M-")
-    ),
-    
-    plotOutput("cont_map")
-  ),
-  
-  server = function(input, output) {
-    output$cont_map <- renderPlot({
-      
-      ggplot() + 
-        geom_polygon(data = coords, aes(x = long, y = lat, group = group), 
-                     fill = "white") + 
-        geom_polygon(data = country.data, aes(x = long, y = lat, group = group,
-                                              fill = Total_Streams)) +
-        scale_color_gradient()
-
-    })
-  }
-  
-)
-```
-
-GRAPH 3: COMPLETE (Can Add More Features)
----
-
-```{r}
-shinyApp(
-  
-  ui = fluidPage(
-    inputPanel(
-      selectInput("country", label = "Country",
-                  choices = unique(data$Country), 
-                  selected = "United States of America"),
-      
-      selectInput("country2", label = "Country 2",
-                  choices = unique(data$Country),
-                  selected = "Canada"),
-      
-      textInput("song", label = "Song Name", 
-                     value = "rockstar"),
-      
-      textInput("artist", label = "Artist Name", 
-                     value = "Post Malone")
-    ),
-    
-    plotOutput("top_ranking_time")
-  ),
-  
-  server = function(input, output) {
-    
-    dataSub <- reactive({
-        if (input$song == "") {
-          chosenSong <- " "
-        }
-        else {
-          chosenSong <- input$song 
-        }
-        subset(data, Track.Name == chosenSong &
-               Artist == input$artist &
-              (Country == input$country | Country == input$country2))
-    })
-    
-    output$top_ranking_time <- renderPlot({
-      subsetOfData <- dataSub()
-      if (nrow(subsetOfData) == 0) {
-        ggplot() + 
-          annotate("text", 
-                   x = 4, y = 25, size = 8, label = "Song/Artist Not Found") + 
-          theme_void() +
-          labs(x = NULL, y = NULL)
-      }
-      else {
-        ggplot(subsetOfData, aes(x = as.Date(Date), y = Streams, 
-                                 color = Country, group = Country)) +
-          scale_x_date(date_labels = "%b %y") +
-          scale_y_continuous(labels = comma) +
-          geom_point() +
-          geom_line() +
-          labs(title = "Song Streams by Country Over Time",
-                x = "Date",
-                y = "Number of Streams") +
-          theme(axis.title.y = 
-                  element_text(margin = margin(r = 20)),
-                axis.title.x =
-                  element_text(margin = margin(t = 20)))
-      }
     })
   },
   
