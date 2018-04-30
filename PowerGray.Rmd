@@ -20,9 +20,6 @@ knitr::opts_chunk$set(echo = TRUE)
 Load-In
 ===
 + Load necessary libraries
-+ Load data from `data.csv`
-+ Check dimensions of the data, expecting a 3441197 x 7 dataframe
-+ Return the first 5 rows
 ```{r, message = FALSE, warning = FALSE}
 library(tidyverse)
 library(dplyr)
@@ -35,7 +32,13 @@ library(ggraph)
 library(ggmap)
 library(maps)
 library(plotly)
+library(scales)
+```
 
++ Load data from `data.csv`
++ Check dimensions of the data, expecting a 3441197 x 7 dataframe
++ Return the first 5 rows
+```{r}
 data = read.csv("data.csv")
 
 dim(data)
