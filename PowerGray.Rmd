@@ -185,11 +185,23 @@ central.america.data <- data[data$Region == "Central America",]
 oceania.data <- data[data$Region == "Oceania",]
 
 top.songs.asia <- asia.data[asia.data[["Position"]] %in% 1:5,]
+top.songs.asia$Artist.Track = paste(top.songs.asia$Artist, 
+                                    top.songs.asia$Track.Name, sep = ".")
 top.songs.europe <- europe.data[europe.data[["Position"]] %in% 1:5,]
+top.songs.europe$Artist.Track = paste(top.songs.europe$Artist, 
+                                    top.songs.europe$Track.Name, sep = ".")
 top.songs.na <- north.america.data[north.america.data[["Position"]] %in% 1:5,]
+top.songs.na$Artist.Track = paste(top.songs.na$Artist, 
+                                    top.songs.na$Track.Name, sep = ".")
 top.songs.sa <- south.america.data[south.america.data[["Position"]] %in% 1:5,]
+top.songs.sa$Artist.Track = paste(top.songs.sa$Artist, 
+                                    top.songs.sa$Track.Name, sep = ".")
 top.songs.ca <- central.america.data[central.america.data[["Position"]] %in% 1:5,]
+top.songs.ca$Artist.Track = paste(top.songs.ca$Artist, 
+                                    top.songs.ca$Track.Name, sep = ".")
 top.songs.oceania <- oceania.data[oceania.data[["Position"]] %in% 1:5,]
+top.songs.oceania$Artist.Track = paste(top.songs.oceania$Artist, 
+                                    top.songs.oceania$Track.Name, sep = ".")
 
 table.asia <- arrange(count(top.songs.asia, "Track.Name"), desc(freq))[1:50,]
 table.europe <- arrange(count(top.songs.europe, "Track.Name"), desc(freq))[1:50,]
@@ -199,26 +211,24 @@ table.ca <- arrange(count(top.songs.ca, "Track.Name"), desc(freq))[1:50,]
 table.oceania <- arrange(count(top.songs.oceania, "Track.Name"), desc(freq))[1:50,]
 
 cum.table <- vector(mode = "list", length = 6)
-names(cum.table) <- c("Asia", "Europe", "North_America", "South_America", 
-                      "Central_America", "Oceania")
-cum.table$Asia <- table.asia
-cum.table$Europe <- table.europe
-cum.table$North_America <- table.na
-cum.table$South_America <- table.sa
-cum.table$Central_America <- table.ca
-cum.table$Oceania <- table.oceania
+names(cum.table) <- c("Asia", "Europe", "North America", "South America", 
+                      "Central America", "Oceania")
+cum.table$'Asia' <- table.asia
+cum.table$'Europe' <- table.europe
+cum.table$'North America' <- table.na
+cum.table$'South America' <- table.sa
+cum.table$'Central America' <- table.ca
+cum.table$'Oceania' <- table.oceania
 ```
 
 
-
-```{r plotly_in_shiny, echo=FALSE, warning=FALSE, message=FALSE, }
+```{r plotly_in_shiny, echo=FALSE, warning=FALSE, message=FALSE}
 shinyApp(
   
   ui = fluidPage(
     inputPanel(
-      selectInput("country", label = "Region:",
-            choices = c("North America" = "North_America", "South America" =
-                      "South_America", "Central America" = "Central_America", 
+      selectInput("region", label = "Region:",
+            choices = c("North America", "South America", "Central America",
                   "Asia", "Europe", "Oceania"), selected = "North America"),
       
       sliderInput("top_n", label = "Top _ songs by days on top 5",
@@ -230,7 +240,7 @@ shinyApp(
   
   server = function(input, output) {
     output$top_songs_plot <- renderPlotly({
-      p <- ggplot(eval(parse(text = paste("cum.table$", input$country, 
+      p <- ggplot(eval(parse(text = paste("cum.table$", "'", input$region, "'",
               sep = "")))[1:input$top_n,], aes(x = Track.Name, y = freq)) + 
         geom_bar(stat = "identity") + 
         labs(title = "Amount of Days Song has been in Top 5 Rankings in 2017", 
@@ -246,7 +256,167 @@ shinyApp(
 )
 ```
 
+```{r}
+top.artists.asia <- arrange(ddply(top.songs.asia, .(Artist), 
+                          function(x) sum(x$Streams))[-1,], desc(V1))[1:25,]
+top.songs.asia.filtered <- top.songs.asia[top.songs.asia$Artist %in%
+                                            top.artists.asia$Artist,]
+top.songs.asia.grouped <- ddply(top.songs.asia.filtered, .(Artist.Track), 
+                                function(x) sum(x$Streams))
+top.songs.asia.grouped$Artist <- vector(mode = "character", 
+                                  length = nrow(top.songs.asia.grouped))
+top.songs.asia.grouped$Track <- vector(mode = "character", 
+                                  length = nrow(top.songs.asia.grouped))
+for (i in 1:nrow(top.songs.asia.grouped)) {
+  top.songs.asia.grouped[i, "Artist"] = 
+           strsplit(top.songs.asia.grouped[i, "Artist.Track"], 
+                    split = ".", fixed = TRUE)[[1]][1]
+  top.songs.asia.grouped[i, "Track"] = 
+           strsplit(top.songs.asia.grouped[i, "Artist.Track"], 
+                    split = ".", fixed = TRUE)[[1]][2]
+}
+colnames(top.songs.asia.grouped)[2] = "Streams"
 
+top.artists.europe <- arrange(ddply(top.songs.europe, .(Artist), 
+                          function(x) sum(x$Streams))[-1,], desc(V1))[1:25,]
+top.songs.europe.filtered <- top.songs.europe[top.songs.europe$Artist %in%
+                                            top.artists.europe$Artist,]
+top.songs.europe.grouped <- ddply(top.songs.europe.filtered, .(Artist.Track), 
+                                function(x) sum(x$Streams))
+top.songs.europe.grouped$Artist <- vector(mode = "character", 
+                                  length = nrow(top.songs.europe.grouped))
+top.songs.europe.grouped$Track <- vector(mode = "character", 
+                                  length = nrow(top.songs.europe.grouped))
+for (i in 1:nrow(top.songs.europe.grouped)) {
+  top.songs.europe.grouped[i, "Artist"] = 
+           strsplit(top.songs.europe.grouped[i, "Artist.Track"], 
+                    split = ".", fixed = TRUE)[[1]][1]
+  top.songs.europe.grouped[i, "Track"] = 
+           strsplit(top.songs.europe.grouped[i, "Artist.Track"], 
+                    split = ".", fixed = TRUE)[[1]][2]
+}
+colnames(top.songs.europe.grouped)[2] = "Streams"
+
+top.artists.na <- arrange(ddply(top.songs.na, .(Artist), 
+                          function(x) sum(x$Streams))[-1,], desc(V1))[1:25,]
+top.songs.na.filtered <- top.songs.na[top.songs.na$Artist %in%
+                                            top.artists.na$Artist,]
+top.songs.na.grouped <- ddply(top.songs.na.filtered, .(Artist.Track), 
+                                function(x) sum(x$Streams))
+top.songs.na.grouped$Artist <- vector(mode = "character", 
+                                  length = nrow(top.songs.na.grouped))
+top.songs.na.grouped$Track <- vector(mode = "character", 
+                                  length = nrow(top.songs.na.grouped))
+for (i in 1:nrow(top.songs.na.grouped)) {
+  top.songs.na.grouped[i, "Artist"] = 
+           strsplit(top.songs.na.grouped[i, "Artist.Track"], 
+                    split = ".", fixed = TRUE)[[1]][1]
+  top.songs.na.grouped[i, "Track"] = 
+           strsplit(top.songs.na.grouped[i, "Artist.Track"], 
+                    split = ".", fixed = TRUE)[[1]][2]
+}
+colnames(top.songs.na.grouped)[2] = "Streams"
+
+top.artists.sa <- arrange(ddply(top.songs.sa, .(Artist), 
+                          function(x) sum(x$Streams))[-1,], desc(V1))[1:25,]
+top.songs.sa.filtered <- top.songs.sa[top.songs.sa$Artist %in%
+                                            top.artists.sa$Artist,]
+top.songs.sa.grouped <- ddply(top.songs.sa.filtered, .(Artist.Track), 
+                                function(x) sum(x$Streams))
+top.songs.sa.grouped$Artist <- vector(mode = "character", 
+                                  length = nrow(top.songs.sa.grouped))
+top.songs.sa.grouped$Track <- vector(mode = "character", 
+                                  length = nrow(top.songs.sa.grouped))
+for (i in 1:nrow(top.songs.sa.grouped)) {
+  top.songs.sa.grouped[i, "Artist"] = 
+           strsplit(top.songs.sa.grouped[i, "Artist.Track"], 
+                    split = ".", fixed = TRUE)[[1]][1]
+  top.songs.sa.grouped[i, "Track"] = 
+           strsplit(top.songs.sa.grouped[i, "Artist.Track"], 
+                    split = ".", fixed = TRUE)[[1]][2]
+}
+colnames(top.songs.sa.grouped)[2] = "Streams"
+
+top.artists.ca <- arrange(ddply(top.songs.ca, .(Artist), 
+                          function(x) sum(x$Streams))[-1,], desc(V1))[1:25,]
+top.songs.ca.filtered <- top.songs.ca[top.songs.ca$Artist %in%
+                                            top.artists.ca$Artist,]
+top.songs.ca.grouped <- ddply(top.songs.ca.filtered, .(Artist.Track), 
+                                function(x) sum(x$Streams))
+top.songs.ca.grouped$Artist <- vector(mode = "character", 
+                                  length = nrow(top.songs.ca.grouped))
+top.songs.ca.grouped$Track <- vector(mode = "character", 
+                                  length = nrow(top.songs.ca.grouped))
+for (i in 1:nrow(top.songs.ca.grouped)) {
+  top.songs.ca.grouped[i, "Artist"] = 
+           strsplit(top.songs.ca.grouped[i, "Artist.Track"], 
+                    split = ".", fixed = TRUE)[[1]][1]
+  top.songs.ca.grouped[i, "Track"] = 
+           strsplit(top.songs.ca.grouped[i, "Artist.Track"], 
+                    split = ".", fixed = TRUE)[[1]][2]
+}
+colnames(top.songs.ca.grouped)[2] = "Streams"
+
+top.artists.oceania <- arrange(ddply(top.songs.oceania, .(Artist), 
+                          function(x) sum(x$Streams))[-1,], desc(V1))[1:25,]
+top.songs.oceania.filtered <- top.songs.oceania[top.songs.oceania$Artist %in%
+                                            top.artists.oceania$Artist,]
+top.songs.oceania.grouped <- ddply(top.songs.oceania.filtered, .(Artist.Track), 
+                                function(x) sum(x$Streams))
+top.songs.oceania.grouped$Artist <- vector(mode = "character", 
+                                  length = nrow(top.songs.oceania.grouped))
+top.songs.oceania.grouped$Track <- vector(mode = "character", 
+                                  length = nrow(top.songs.oceania.grouped))
+for (i in 1:nrow(top.songs.oceania.grouped)) {
+  top.songs.oceania.grouped[i, "Artist"] = 
+           strsplit(top.songs.oceania.grouped[i, "Artist.Track"], 
+                    split = ".", fixed = TRUE)[[1]][1]
+  top.songs.oceania.grouped[i, "Track"] = 
+           strsplit(top.songs.oceania.grouped[i, "Artist.Track"], 
+                    split = ".", fixed = TRUE)[[1]][2]
+}
+colnames(top.songs.oceania.grouped)[2] = "Streams"
+
+```
+
+
+```{r plotly_in_shiny, echo=FALSE, warning=FALSE, message=FALSE}
+shinyApp(
+  
+  ui = fluidPage(
+    inputPanel(
+      selectInput("region", label = "Region:",
+            choices = c("North America" = "na", "South America" = "sa", 
+                  "Central America" = "ca", "Asia" = "asia", 
+                  "Europe" = "europe", "Oceania" = "oceania"), 
+            selected = "na"),
+      
+      selectInput("artist", label = "Artist:",
+            choices = unique(top.songs.na.grouped$Artist), 
+            selected = "Ed Sheeran")
+            
+      
+    ),
+    
+    plotlyOutput("top_artist_prop_plot")
+  ),
+  
+  server = function(input, output) {
+    output$top_artist_prop_plot <- renderPlotly({
+      p <- ggplot(eval(parse(text = paste("top.songs.", input$region, ".grouped",
+              sep = "")))[eval(parse(text = paste("top.songs.", 
+                input$region, ".grouped$Artist", sep = ""))) == input$artist,], 
+              aes(x = Track, y = Streams)) + 
+        geom_bar(aes(x = factor(1), fill = Track), stat = "identity",
+                 width = .5)
+      
+      ggplotly(p)
+    })
+  },
+  
+  options = list(height = 550)
+)
+```
 
 Graphics
 ===
