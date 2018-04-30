@@ -7,6 +7,9 @@ output:
     toc:  true
     toc_float:  true
     code_folding:  show
+  html_notebook: 
+    toc: yes
+runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
@@ -31,8 +34,11 @@ library(igraph)
 library(ggraph)
 library(ggmap)
 library(maps)
+<<<<<<< HEAD
 library(sp)
 library(plotly)
+=======
+>>>>>>> 69f8b5780f5bd8519776fe7c66b2fa3e0ccc7c35
 
 data = read.csv("data.csv")
 
@@ -63,7 +69,19 @@ data$Month = sapply(data$Date, date.to.month)
 + Apply `code.to.country()`across the `Region` column of our data, creating a new column `Country`
 ```{r}
 countries = unique(data$Region)
-names(countries) = c("Ecuador", "France", "Argentina", "Finland", "Norway", "Italy", "Lithuania", "Philippines", "Taiwan", "New Zealand", "Estonia", "Turkey", "United States of America", "El Salvador", "Costa Rica", "Germany", "Chile", "Japan", "Brazil", "Honduras", "Guatemala", "Switzerland", "Hungary", "Canada", "Peru", "Belgium", "Malaysia", "Denmark", "Bolivia", "Poland", "Austria", "Portugal", "Sweden", "Mexico", "Panama", "Uruguay", "Iceland", "Spain", "Czech Republic", "Ireland", "Netherlands", "Slovakia", "Colombia", "Singapore", "Indonesia", "Dominican Republic", "Luxembourg", "United Kingdom", "World", "Paraguay", "Australia", "Latvia", "Greece", "Hong Kong")
+names(countries) = c("Ecuador", "France", "Argentina", "Finland", "Norway", 
+                     "Italy", "Lithuania", "Philippines", "Taiwan", 
+                     "New Zealand", "Estonia", "Turkey", 
+                     "USA", "El Salvador", "Costa Rica", 
+                     "Germany", "Chile", "Japan", "Brazil", "Honduras", 
+                     "Guatemala", "Switzerland", "Hungary", "Canada", "Peru", 
+                     "Belgium", "Malaysia", "Denmark", "Bolivia", "Poland", 
+                     "Austria", "Portugal", "Sweden", "Mexico", "Panama", 
+                     "Uruguay", "Iceland", "Spain", "Czech Republic", "Ireland", 
+                     "Netherlands", "Slovakia", "Colombia", "Singapore", 
+                     "Indonesia", "Dominican Republic", "Luxembourg", 
+                     "UK", "World", "Paraguay", "Australia", 
+                     "Latvia", "Greece", "Hong Kong")
 
 code.to.country = function(code) {
   code = as.character(code)
@@ -78,7 +96,6 @@ data$Country = sapply(data$Region, code.to.country)
 + E.g. `country.to.continent("Ecuador")` returns "South America"
 + Apply `country.to.continent()`across the `Country` column of our data, replacing the column `Region`
 ```{r}
-world = c("World")
 asia = c("Philippines", "Taiwan", "Japan", "Malaysia", "Singapore", "Indonesia", 
          "Hong Kong")
 europe = c("France", "Finland", "Norway", "Italy", "Lithuania", "Estonia", 
@@ -86,7 +103,7 @@ europe = c("France", "Finland", "Norway", "Italy", "Lithuania", "Estonia",
            "Poland", "Austria", "Portugal", "Sweden", "Iceland", "Spain", 
            "Czech Republic", "Ireland", "Netherlands", "Slovakia", "Luxembourg", 
            "United Kingdom", "Latvia", "Greece")
-northamerica = c("United States of America", "Canada", "Mexico")
+northamerica = c("USA", "Canada", "Mexico")
 centralamerica = c("El Salvador", "Costa Rica", "Honduras", "Guatemala", 
                    "Panama", "Dominican Republic")
 southamerica = c("Ecuador", "Argentina", "Chile", "Brazil", "Peru", "Bolivia", 
@@ -95,7 +112,6 @@ oceania = c("New Zealand", "Australia")
 
 country.to.continent = function(country) {
   country = as.character(country)
-  if (country %in% world) return("World")
   if (country %in% asia) return("Asia")
   if (country %in% europe) return("Europe")
   if (country %in% northamerica) return("North America")
@@ -120,9 +136,11 @@ streams.by.cont = ddply(data, .(Region), function(x) summary(x$Streams))
 # Total streams, world wide
 tot.streams = sum(as.numeric(data$Streams))
 # Summary statistics on top 200 streams, by country
-tot.streams.by.country = ddply(data, .(Country), function(x) sum(as.numeric(x$Streams)))
+tot.streams.by.country = ddply(data, .(Country), 
+                               function(x) sum(as.numeric(x$Streams)))
 # Summary statistics on top 200 streams, by continent
-tot.streams.by.cont = ddply(data, .(Region), function(x) sum(as.numeric(x$Streams)))
+tot.streams.by.cont = ddply(data, .(Region), 
+                            function(x) sum(as.numeric(x$Streams)))
 
 # How many times did Artists end up in the top 200 rankings, world wide?
 artists = as.data.frame(table(data$Artist))
@@ -131,8 +149,30 @@ artists.by.country = ddply(data, .(Country), function(x) table(x$Artist))
 # How many times did Artists end up in the top 200 rankings, by continent?
 artists.by.cont = ddply(data, .(Region), function(x) table(x$Artist))
 
-colnames(tot.streams.by.country)[2] = "Total_Streams"
-country.data = left_join(tot.streams.by.country, artists.by.country, by = "Country")
+# How many unique Artists are there in the top 200 rankings, world wide?
+n.artists = nrow(artists)
+# How many times did Artists end up in the top 200 rankings, by country?
+n.artists.by.country = ddply(artists.by.country, .(Country), 
+                             function(x) sum(x != 0))
+# How many times did Artists end up in the top 200 rankings, by continent?
+n.artists.by.cont = ddply(artists.by.cont, .(Region), 
+                          function(x) sum(x != 0))
+
+# How many times did tracks end up in the top 200 rankings, world wide?
+tracks = as.data.frame(table(data$Track.Name))
+# How many times did tracks end up in the top 200 rankings, by country?
+tracks.by.country = ddply(data, .(Country), function(x) table(x$Track.Name))
+# How many times did tracks end up in the top 200 rankings, by continent?
+tracks.by.cont = ddply(data, .(Region), function(x) table(x$Track.Name))
+
+# How many unique Artists are there in the top 200 rankings, world wide?
+n.tracks = nrow(tracks)
+# How many times did Artists end up in the top 200 rankings, by country?
+n.tracks.by.country = ddply(tracks.by.country, .(Country), 
+                             function(x) sum(x != 0))
+# How many times did Artists end up in the top 200 rankings, by continent?
+n.tracks.by.cont = ddply(tracks.by.cont, .(Region), 
+                          function(x) sum(x != 0))
 ```
 
 
@@ -211,6 +251,193 @@ shinyApp(
 Graphics
 ===
 
+Set Up for Graph 1
+---
++ Create the `country.data` dataframe that consolidates the number of streams, tracks and artists of each country into one table
++ Use `map_data` to add goegraphical data for our map graphic 
+```{r}
+data.asia = data[which(data$Region == "Asia"),]
+data.europe = data[which(data$Region == "Europe"),]
+data.northamerica = data[which(data$Region == "North America"),]
+data.centralamerica = data[which(data$Region == "Central America"),] 
+data.southamerica = data[which(data$Region == "South America"),] 
+data.oceania = data[which(data$Region == "Oceania"),] 
 
+colnames(tot.streams.by.country)[2] = "Total_Streams"
+country.data = tot.streams.by.country
 
+colnames(n.artists.by.country)[2] = "N_Artists"
+country.data = left_join(country.data, n.artists.by.country, 
+                         by = "Country")
 
+colnames(n.tracks.by.country)[2] = "N_Tracks"
+country.data = left_join(country.data, n.tracks.by.country, 
+                         by = "Country")
+
+country.data = left_join(country.data, artists.by.country, 
+                         by = "Country")
+
+coords = map_data("world")
+coords$Country = coords$region
+coords = coords[,c("Country", "long", "lat", "group")]
+
+country.data = left_join(country.data, coords, by = c("Country"))
+```
+
+Graph 1
+---
+Compare the Countries by:
+
+    + Number of streams 
+    + Number of top tracks listened to 
+    + Number of top artists listeed to (do they tend to listen to more top tracks by the same artists)
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+shinyApp(
+  ui = fluidPage(
+    inputPanel(
+       radioButtons("variable", label = "Fill Variable:",
+                   choiceNames = c("Number of Streams", "Number of Tracks", 
+                                   "Number of Artists"),
+                   choiceValues = c("Total_Streams", "N_Tracks", "N_Artists"))
+    ),
+    plotOutput("world_map")
+  ),
+  
+  server = function(input, output) {
+    output$world_map <- renderPlot({
+      
+      rplot = ggplot() + 
+        geom_polygon(data = coords, aes(x = long, y = lat, group = group), 
+                     fill = "white") +
+        geom_polygon(data = country.data, aes_string(x = "long", y = "lat", 
+                                                     group = "group",
+                                                     fill = input$variable)) +
+        scale_fill_gradient2(high = "brown", low = "purple", mid = "white") +
+        labs(title = "Top 200 ranking Spotify tracks worldwide",
+             x = "", 
+             y = "") +
+        theme(axis.text.x = element_blank(),
+              axis.text.y = element_blank())
+      
+      if(input$variable == "Total_Streams") 
+        rplot = rplot + labs(fill = "Number of Streams")
+      if(input$variable == "N_Tracks") 
+        rplot = rplot + labs(fill = "Number of Tracks")
+      if(input$variable == "N_Artists") 
+        rplot = rplot + labs(fill = "Number of Artists")
+      
+      rplot
+      
+      })
+  },
+  options = list(height = 550)
+)
+```
+
+Graph 2: INCOMPLETE
+---
+
+```{r, eval = FALSE, include = FALSE}
+shinyApp(
+  
+  ui = fluidPage(
+    inputPanel(
+      selectInput("continent", label = "Continent:",
+                  choices = c("Asia", "Europe", "Central America", 
+                              "North America", "Oceania", "South America", 
+                              "World"), 
+                  selected = "Asia"),
+      
+      selectInput("artist", label = "Top 200 Artist:",
+                  choices = artists, selected = "-M-")
+    ),
+    
+    plotOutput("cont_map")
+  ),
+  
+  server = function(input, output) {
+    output$cont_map <- renderPlot({
+      
+      ggplot() + 
+        geom_polygon(data = coords, aes(x = long, y = lat, group = group), 
+                     fill = "white") + 
+        geom_polygon(data = country.data, aes(x = long, y = lat, group = group,
+                                              fill = Total_Streams)) +
+        scale_color_gradient()
+
+    })
+  }
+  
+)
+```
+
+GRAPH 3: COMPLETE (Can Add More Features)
+---
+
+```{r}
+shinyApp(
+  
+  ui = fluidPage(
+    inputPanel(
+      selectInput("country", label = "Country",
+                  choices = unique(data$Country), 
+                  selected = "United States of America"),
+      
+      selectInput("country2", label = "Country 2",
+                  choices = unique(data$Country),
+                  selected = "Canada"),
+      
+      textInput("song", label = "Song Name", 
+                     value = "rockstar"),
+      
+      textInput("artist", label = "Artist Name", 
+                     value = "Post Malone")
+    ),
+    
+    plotOutput("top_ranking_time")
+  ),
+  
+  server = function(input, output) {
+    
+    dataSub <- reactive({
+        if (input$song == "") {
+          chosenSong <- " "
+        }
+        else {
+          chosenSong <- input$song 
+        }
+        subset(data, Track.Name == chosenSong &
+               Artist == input$artist &
+              (Country == input$country | Country == input$country2))
+    })
+    
+    output$top_ranking_time <- renderPlot({
+      subsetOfData <- dataSub()
+      if (nrow(subsetOfData) == 0) {
+        ggplot() + 
+          annotate("text", 
+                   x = 4, y = 25, size = 8, label = "Song/Artist Not Found") + 
+          theme_void() +
+          labs(x = NULL, y = NULL)
+      }
+      else {
+        ggplot(subsetOfData, aes(x = as.Date(Date), y = Streams, 
+                                 color = Country, group = Country)) +
+          scale_x_date(date_labels = "%b %y") +
+          scale_y_continuous(labels = comma) +
+          geom_point() +
+          geom_line() +
+          labs(title = "Song Streams by Country Over Time",
+                x = "Date",
+                y = "Number of Streams") +
+          theme(axis.title.y = 
+                  element_text(margin = margin(r = 20)),
+                axis.title.x =
+                  element_text(margin = margin(t = 20)))
+      }
+    })
+  },
+  
+  options = list(height = 550)
+)
+```
