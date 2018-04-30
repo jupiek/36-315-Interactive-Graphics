@@ -32,6 +32,7 @@ library(ggraph)
 library(ggmap)
 library(maps)
 library(sp)
+library(plotly)
 
 data = read.csv("data.csv")
 
@@ -133,6 +134,78 @@ artists.by.cont = ddply(data, .(Region), function(x) table(x$Artist))
 colnames(tot.streams.by.country)[2] = "Total_Streams"
 country.data = left_join(tot.streams.by.country, artists.by.country, by = "Country")
 ```
+
+
+```{r}
+asia.data <- data[data$Region == "Asia",]
+europe.data <- data[data$Region == "Europe",]
+north.america.data <- data[data$Region == "North America",]
+south.america.data <- data[data$Region == "South America",]
+central.america.data <- data[data$Region == "Central America",]
+oceania.data <- data[data$Region == "Oceania",]
+
+top.songs.asia <- asia.data[asia.data[["Position"]] %in% 1:5,]
+top.songs.europe <- europe.data[europe.data[["Position"]] %in% 1:5,]
+top.songs.na <- north.america.data[north.america.data[["Position"]] %in% 1:5,]
+top.songs.sa <- south.america.data[south.america.data[["Position"]] %in% 1:5,]
+top.songs.ca <- central.america.data[central.america.data[["Position"]] %in% 1:5,]
+top.songs.oceania <- oceania.data[oceania.data[["Position"]] %in% 1:5,]
+
+table.asia <- arrange(count(top.songs.asia, "Track.Name"), desc(freq))[1:50,]
+table.europe <- arrange(count(top.songs.europe, "Track.Name"), desc(freq))[1:50,]
+table.na <- arrange(count(top.songs.na, "Track.Name"), desc(freq))[1:50,]
+table.sa <- arrange(count(top.songs.sa, "Track.Name"), desc(freq))[1:50,]
+table.ca <- arrange(count(top.songs.ca, "Track.Name"), desc(freq))[1:50,]
+table.oceania <- arrange(count(top.songs.oceania, "Track.Name"), desc(freq))[1:50,]
+
+cum.table <- vector(mode = "list", length = 6)
+names(cum.table) <- c("Asia", "Europe", "North_America", "South_America", 
+                      "Central_America", "Oceania")
+cum.table$Asia <- table.asia
+cum.table$Europe <- table.europe
+cum.table$North_America <- table.na
+cum.table$South_America <- table.sa
+cum.table$Central_America <- table.ca
+cum.table$Oceania <- table.oceania
+```
+
+
+
+```{r plotly_in_shiny, echo=FALSE, warning=FALSE, message=FALSE, }
+shinyApp(
+  
+  ui = fluidPage(
+    inputPanel(
+      selectInput("country", label = "Region:",
+            choices = c("North America" = "North_America", "South America" =
+                      "South_America", "Central America" = "Central_America", 
+                  "Asia", "Europe", "Oceania"), selected = "North America"),
+      
+      sliderInput("top_n", label = "Top _ songs by days on top 5",
+                  min = 5, max = 50, value = 10, step = 5)
+    ),
+    
+    plotlyOutput("top_songs_plot")
+  ),
+  
+  server = function(input, output) {
+    output$top_songs_plot <- renderPlotly({
+      p <- ggplot(eval(parse(text = paste("cum.table$", input$country, 
+              sep = "")))[1:input$top_n,], aes(x = Track.Name, y = freq)) + 
+        geom_bar(stat = "identity") + 
+        labs(title = "Amount of Days Song has been in Top 5 Rankings in 2017", 
+          x = "Song Name", y = "Number of Days", 
+          caption = "Source: Spotify's Worldwide Daily Song Ranking") + 
+        theme(axis.text.x = element_text(angle = 25))
+      
+      ggplotly(p)
+    })
+  },
+  
+  options = list(height = 550)
+)
+```
+
 
 
 Graphics
