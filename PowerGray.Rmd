@@ -34,6 +34,7 @@ library(igraph)
 library(ggraph)
 library(ggmap)
 library(maps)
+library(plotly)
 
 data = read.csv("data.csv")
 
@@ -223,18 +224,18 @@ shinyApp(
                                    "Number of Artists"),
                    choiceValues = c("Total_Streams", "N_Tracks", "N_Artists"))
     ),
-    plotOutput("world_map")
+    plotlyOutput("world_map")
   ),
   
   server = function(input, output) {
-    output$world_map <- renderPlot({
+    output$world_map <- renderPlotly({
       
       rplot = ggplot() + 
         geom_polygon(data = coords, aes(x = long, y = lat, group = group), 
                      fill = "white") +
         geom_polygon(data = country.data, aes_string(x = "long", y = "lat", 
                                                      group = "group",
-                                                     fill = input$variable)) +
+                                                     fill = input$variable)) + 
         scale_fill_gradient2(high = "brown", low = "purple", mid = "white") +
         labs(title = "Top 200 ranking Spotify tracks worldwide",
              x = "", 
@@ -249,7 +250,7 @@ shinyApp(
       if(input$variable == "N_Artists") 
         rplot = rplot + labs(fill = "Number of Artists")
       
-      rplot
+      ggplotly(rplot)
       
       })
   },
@@ -259,7 +260,6 @@ shinyApp(
 
 Graph 2: INCOMPLETE
 ---
-
 ```{r, eval = FALSE, include = FALSE}
 shinyApp(
   
@@ -296,7 +296,6 @@ shinyApp(
 
 GRAPH 3: COMPLETE (Can Add More Features)
 ---
-
 ```{r}
 shinyApp(
   
