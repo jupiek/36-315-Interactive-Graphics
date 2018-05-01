@@ -27,8 +27,6 @@ library(plyr)
 library(shiny)
 library(rsconnect)
 library(ggplot2)
-library(igraph)
-library(ggraph)
 library(ggmap)
 library(maps)
 library(sp)
@@ -103,7 +101,7 @@ europe = c("France", "Finland", "Norway", "Italy", "Lithuania", "Estonia",
            "Turkey", "Germany", "Switzerland", "Hungary", "Belgium", "Denmark", 
            "Poland", "Austria", "Portugal", "Sweden", "Iceland", "Spain", 
            "Czech Republic", "Ireland", "Netherlands", "Slovakia", "Luxembourg", 
-           "United Kingdom", "Latvia", "Greece")
+           "UK", "Latvia", "Greece")
 northamerica = c("USA", "Canada", "Mexico")
 centralamerica = c("El Salvador", "Costa Rica", "Honduras", "Guatemala", 
                    "Panama", "Dominican Republic")
@@ -175,6 +173,7 @@ n.tracks.by.country = ddply(tracks.by.country, .(Country),
 n.tracks.by.cont = ddply(tracks.by.cont, .(Region), 
                           function(x) sum(x != 0))
 ```
+
 
 Graphics
 ===
@@ -337,7 +336,7 @@ shinyApp(
     inputPanel(
       selectInput("country", label = "Country",
                   choices = unique(data$Country), 
-                  selected = "United States of America"),
+                  selected = "USA"),
       
       selectInput("country2", label = "Country 2",
                   choices = unique(data$Country),
@@ -447,7 +446,7 @@ cum.table$'Oceania' <- table.oceania
 
 Graph 4
 ---
-```{r plotly_in_shiny, echo=FALSE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 shinyApp(
   
   ui = fluidPage(
