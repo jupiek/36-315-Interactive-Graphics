@@ -273,7 +273,7 @@ top15 = function(area, type) {
   if(type == "cont") 
     cy = artists.by.cont[which(artists.by.cont$Region == area),]
   flipped.cy = data.frame(t(cy[-1]))
-  colnames(flipped.cy) = arg[, 1]
+  colnames(flipped.cy) = cy[, 1]
   
   artists = rev(rownames(flipped.cy)[order(flipped.cy[,1], decreasing = TRUE)][1:15])
   appearances = rev(flipped.cy[order(flipped.cy[,1], decreasing = TRUE),][1:15])
@@ -350,7 +350,7 @@ shinyApp(
                      value = "Post Malone")
     ),
     
-    plotOutput("top_ranking_time")
+    plotOutput("streams_over_time")
   ),
   
   server = function(input, output) {
@@ -367,7 +367,7 @@ shinyApp(
               (Country == input$country | Country == input$country2))
     })
     
-    output$top_ranking_time <- renderPlot({
+    output$streams_over_time <- renderPlot({
       subsetOfData <- dataSub()
       if (nrow(subsetOfData) == 0) {
         ggplot() + 
