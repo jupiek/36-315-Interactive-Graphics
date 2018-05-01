@@ -651,3 +651,73 @@ shinyApp(
   options = list(height = 550)
 )
 ```
+
+Graph 6
+---
+```{r}
+shinyApp(
+  
+  ui = fluidPage(
+    inputPanel(
+      selectInput("region", label = "Region",
+                  choices = unique(data$Region), 
+                  selected = "United States of America")),
+    plotOutput("top_songs")
+  ),
+  
+  server = function(input, output) {
+    dataSub <- reactive({
+        data.c = data[which(data$Region == input$region),]
+        data.c = data.c = aggregate(data.c$Streams, by=list(Name=data.c$Track.Name), FUN=sum)
+        head(arrange(data.c,desc(data.c$x)), 10)
+    })
+    output$top_songs <- renderPlot({
+        ggplot(dataSub(), aes(x = Name, y = x)) +
+          geom_bar(stat = 'identity') +
+          #scale_y_continuous(labels = comma) +
+          labs(title = "Top Songs by Country",
+                x = "Song",
+                y = "Number of Streams")  +
+          theme(axis.title.y = 
+                  element_text(margin = margin(r = 20)),
+                axis.title.x =
+                  element_text(margin = margin(t = 20)))
+      })},
+  
+  options = list(height = 550)
+)
+```
+
+Graph 7
+---
+```{r}
+shinyApp(
+  ui = fluidPage(
+    inputPanel(
+      selectInput("region", label = "Region",
+                  choices = unique(data$Region), 
+                  selected = "United States of America")),
+    plotOutput("songs_time")
+  ),
+  
+  server = function(input, output) {
+    dataSub <- reactive({
+      data.d = data[which(data$Region == input$region),]
+      aggregate(data.d$Streams, by=list(Category=data.d$Date), FUN=sum)
+    })
+    output$songs_time <- renderPlot({
+        head(dataSub())
+        ggplot(dataSub(), aes(x = as.Date(Category), y = x)) + geom_point() +
+          geom_line() +
+          labs(title = "Song Streams by Country Over Time",
+                x = "Date",
+                y = "Number of Streams") + 
+          theme(axis.title.y = 
+                  element_text(margin = margin(r = 20)),
+                axis.title.x =
+                  element_text(margin = margin(t = 20)))
+      })},
+  
+  options = list(height = 550)
+)
+```
