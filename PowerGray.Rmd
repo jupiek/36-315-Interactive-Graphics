@@ -272,7 +272,7 @@ top15 = function(area, type) {
   if(type == "cont") 
     cy = artists.by.cont[which(artists.by.cont$Region == area),]
   flipped.cy = data.frame(t(cy[-1]))
-  colnames(flipped.cy) = arg[, 1]
+  colnames(flipped.cy) = cy[, 1]
   
   artists = rev(rownames(flipped.cy)[order(flipped.cy[,1], decreasing = TRUE)][1:15])
   appearances = rev(flipped.cy[order(flipped.cy[,1], decreasing = TRUE),][1:15])
@@ -292,7 +292,7 @@ shinyApp(
     inputPanel(
       selectInput("country", label = "Country:",
                   choices = sort(names(countries)),
-                  selected = "Asia")
+                  selected = "Argentina")
     ),
     plotOutput("cplot")
   ),
@@ -320,7 +320,7 @@ shinyApp(
              x = "Artist", y = "Number of Appearances")
       
       grid.arrange(grobs = list(rplot1, rplot2), nrow = 1, 
-                   top = "Top 15 Artists Spotify by Country\ncompared with continent")
+                   top = "Top 15 Artists Spotify by Country\ncompared with respective continent")
     })
   }
   
