@@ -328,7 +328,7 @@ shinyApp(
 )
 ```
 
-GRAPH 3: COMPLETE (Can Add More Features)
+Graph 3
 ---
 ```{r}
 shinyApp(
@@ -398,12 +398,8 @@ shinyApp(
 )
 ```
 
-
 Set Up for Graph 4
 ---
-+ 
-+  
-
 ```{r}
 asia.data <- data[data$Region == "Asia",]
 europe.data <- data[data$Region == "Europe",]
@@ -449,8 +445,7 @@ cum.table$'Central America' <- table.ca
 cum.table$'Oceania' <- table.oceania
 ```
 
-
-GRAPH 4:
+Graph 4
 ---
 ```{r plotly_in_shiny, echo=FALSE, warning=FALSE, message=FALSE}
 shinyApp(
@@ -488,9 +483,6 @@ shinyApp(
 
 Set Up for Graph 5
 ---
-+ 
-+ 
-
 ```{r}
 top.artists.asia <- arrange(ddply(top.songs.asia, .(Artist), 
                           function(x) sum(x$Streams))[-1,], desc(V1))[1:25,]
@@ -614,7 +606,7 @@ colnames(top.songs.oceania.grouped)[2] = "Streams"
 
 ```
 
-GRAPH 5
+Graph 5
 ---
 ```{r plotly_in_shiny, echo=FALSE, warning=FALSE, message=FALSE}
 shinyApp(
