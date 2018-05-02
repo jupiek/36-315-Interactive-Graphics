@@ -12,7 +12,7 @@ library(scales)
 library(gridExtra)
 library(shinydashboard)
 
-load("shiny.RData")
+load("shiny_ed_fullData.RData")
 
 
 # SHINY APP CODE
@@ -27,7 +27,10 @@ ui <- dashboardPage(
       menuItem("Graph 2", tabName = "graph2", icon = icon("th")),
       menuItem("Graph 3", tabName = "graph3", icon = icon("th")),
       menuItem("Graph 4", tabName = "graph4", icon = icon("th")),
-      menuItem("Graph 5", tabName = "graph5", icon = icon("th"))
+      menuItem("Graph 5", tabName = "graph5", icon = icon("th")),
+      menuItem("Graph 6", tabName = "graph6", icon = icon("th")),
+      menuItem("Graph 7", tabName = "graph7", icon = icon("th")),
+      menuItem("Graph 8", tabName = "graph8", icon = icon("th"))
     )
   ),
   dashboardBody(
@@ -110,7 +113,41 @@ ui <- dashboardPage(
           ),
           plotlyOutput("top_artist_prop_plot")
         )
+      ),
+      
+      # Sixth tab content
+      tabItem(tabName = "graph6",
+        fluidPage(
+          inputPanel(
+            selectInput("region6", label = "Region",
+                        choices = c("North America", "South America", 
+                                    "Central America",
+                                    "Asia", "Europe", "Oceania"), 
+                        selected = "North America")),
+          plotOutput("top_songs")
+        )            
+      ),
+      
+      # Seventh tab content
+      tabItem(tabName = "graph7",
+        fluidPage(
+          inputPanel(
+            selectInput("region7", label = "Region",
+                        choices = c("North America", "South America", 
+                                    "Central America",
+                                    "Asia", "Europe", "Oceania"), 
+                        selected = "North America")),
+          plotOutput("songs_time")
+        )
+      ),
+      
+      # Eighth tab content
+      tabItem(tabName = "graph8",
+        fluidPage(
+          plotOutput("edSheeran")
+        )        
       )
+      
       
     )
   )
@@ -245,6 +282,55 @@ server <- function(input, output, session) {
     ggplotly(p)
   })
   
+  
+  # Graph 6
+  dataSub6 <- reactive({
+    data.c = data[which(data$Region == input$region6),]
+    data.c = data.c = aggregate(data.c$Streams, by=list(Name=data.c$Track.Name), FUN=sum)
+    head(arrange(data.c,desc(data.c$x)), 10)
+  })
+  output$top_songs <- renderPlot({
+    ggplot(dataSub6(), aes(x = Name, y = x)) +
+      geom_bar(stat = 'identity') +
+      #scale_y_continuous(labels = comma) +
+      labs(title = "Top Songs by Country",
+           x = "Song",
+           y = "Number of Streams")  +
+      theme(axis.title.y = 
+              element_text(margin = margin(r = 20)),
+            axis.title.x =
+              element_text(margin = margin(t = 20)))
+  })
+  
+  # Graph 7
+  dataSub7 <- reactive({
+    data.d = data[which(data$Region == input$region7),]
+    aggregate(data.d$Streams, by=list(Category=data.d$Date), FUN=sum)
+  })
+  output$songs_time <- renderPlot({
+    ggplot(dataSub7(), aes(x = as.Date(Category), y = x)) + geom_point() +
+      geom_line() +
+      labs(title = "Song Streams by Region Over Time",
+           x = "Date",
+           y = "Number of Streams") + 
+      theme(axis.title.y = 
+              element_text(margin = margin(r = 20)),
+            axis.title.x =
+              element_text(margin = margin(t = 20)))
+  })
+  
+  # Graph 8
+  
+  output$edSheeran <- renderPlot({
+    ggplot(edData, aes(x = as.Date(Date), y = Position, col = `Track.Name`)) + 
+      geom_point(alpha = 0.7, size = 3) +
+      scale_y_reverse(breaks = seq(0,100,10)) +
+      scale_x_date() +
+      ggtitle("Ed Sheeran on Top 100 Daily List in US") +
+      theme_bw() +
+      theme(plot.title = element_text(size = 14, face = "bold")) +
+      theme(legend.title=element_blank())
+  })
 }
 
 shinyApp(ui, server)
