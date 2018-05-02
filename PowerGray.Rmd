@@ -22,11 +22,9 @@ Load-In
 + Load necessary libraries
 ```{r, message = FALSE, warning = FALSE}
 library(tidyverse)
-library(dplyr)
 library(plyr)
 library(shiny)
 library(rsconnect)
-library(ggplot2)
 library(igraph)
 library(ggraph)
 library(ggmap)
@@ -337,7 +335,7 @@ shinyApp(
     inputPanel(
       selectInput("country", label = "Country",
                   choices = unique(data$Country), 
-                  selected = "United States of America"),
+                  selected = "USA"),
       
       selectInput("country2", label = "Country 2",
                   choices = unique(data$Country),
