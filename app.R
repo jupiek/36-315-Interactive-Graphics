@@ -1,5 +1,16 @@
 ## app.R ##
 
+library(tidyverse)
+library(plyr)
+library(shiny)
+library(rsconnect)
+library(ggmap)
+library(maps)
+library(sp)
+library(plotly)
+library(scales)
+library(gridExtra)
+library(shinydashboard)
 
 load("shiny.RData")
 
@@ -106,7 +117,9 @@ ui <- dashboardPage(
 )
 
 server <- function(input, output, session) {
-
+  
+  options(warn = -1)
+  
   # Graph 1
   output$world_map <- renderPlotly({
     
