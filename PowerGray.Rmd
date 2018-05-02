@@ -101,7 +101,7 @@ europe = c("France", "Finland", "Norway", "Italy", "Lithuania", "Estonia",
            "Turkey", "Germany", "Switzerland", "Hungary", "Belgium", "Denmark", 
            "Poland", "Austria", "Portugal", "Sweden", "Iceland", "Spain", 
            "Czech Republic", "Ireland", "Netherlands", "Slovakia", "Luxembourg", 
-           "United Kingdom", "Latvia", "Greece")
+           "UK", "Latvia", "Greece")
 northamerica = c("USA", "Canada", "Mexico")
 centralamerica = c("El Salvador", "Costa Rica", "Honduras", "Guatemala", 
                    "Panama", "Dominican Republic")
@@ -173,6 +173,7 @@ n.tracks.by.country = ddply(tracks.by.country, .(Country),
 n.tracks.by.cont = ddply(tracks.by.cont, .(Region), 
                           function(x) sum(x != 0))
 ```
+
 
 Graphics
 ===
@@ -291,7 +292,7 @@ shinyApp(
     inputPanel(
       selectInput("country", label = "Country:",
                   choices = sort(names(countries)),
-                  selected = "Asia")
+                  selected = "Argentina")
     ),
     plotOutput("cplot")
   ),
@@ -319,7 +320,7 @@ shinyApp(
              x = "Artist", y = "Number of Appearances")
       
       grid.arrange(grobs = list(rplot1, rplot2), nrow = 1, 
-                   top = "Top 15 Artists Spotify by Country\ncompared with continent")
+                   top = "Top 15 Artists Spotify by Country\ncompared with respective continent")
     })
   }
   
@@ -445,7 +446,7 @@ cum.table$'Oceania' <- table.oceania
 
 Graph 4
 ---
-```{r plotly_in_shiny, echo=FALSE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 shinyApp(
   
   ui = fluidPage(
@@ -646,6 +647,130 @@ shinyApp(
       ggplotly(p)
     })
   },
+  
+  options = list(height = 550)
+)
+```
+
+Graph 6
+---
+```{r}
+shinyApp(
+  
+  ui = fluidPage(
+    inputPanel(
+      selectInput("region", label = "Region",
+                  choices = unique(data$Region), 
+                  selected = "United States of America")),
+    plotOutput("top_songs")
+  ),
+  
+  server = function(input, output) {
+    dataSub <- reactive({
+        data.c = data[which(data$Region == input$region),]
+        data.c = data.c = aggregate(data.c$Streams, by=list(Name=data.c$Track.Name), FUN=sum)
+        head(arrange(data.c,desc(data.c$x)), 10)
+    })
+    output$top_songs <- renderPlot({
+        ggplot(dataSub(), aes(x = Name, y = x)) +
+          geom_bar(stat = 'identity') +
+          #scale_y_continuous(labels = comma) +
+          labs(title = "Top Songs by Country",
+                x = "Song",
+                y = "Number of Streams")  +
+          theme(axis.title.y = 
+                  element_text(margin = margin(r = 20)),
+                axis.title.x =
+                  element_text(margin = margin(t = 20)))
+      })},
+  
+  options = list(height = 550)
+)
+```
+
+Graph 7
+---
+```{r}
+shinyApp(
+  ui = fluidPage(
+    inputPanel(
+      selectInput("region", label = "Region",
+                  choices = unique(data$Region), 
+                  selected = "United States of America")),
+    plotOutput("songs_time")
+  ),
+  
+  server = function(input, output) {
+    dataSub <- reactive({
+      data.d = data[which(data$Region == input$region),]
+      aggregate(data.d$Streams, by=list(Category=data.d$Date), FUN=sum)
+    })
+    output$songs_time <- renderPlot({
+        head(dataSub())
+        ggplot(dataSub(), aes(x = as.Date(Category), y = x)) + geom_point() +
+          geom_line() +
+          labs(title = "Song Streams by Country Over Time",
+                x = "Date",
+                y = "Number of Streams") + 
+          theme(axis.title.y = 
+                  element_text(margin = margin(r = 20)),
+                axis.title.x =
+                  element_text(margin = margin(t = 20)))
+      })},
+  
+  options = list(height = 550)
+)
+```
+
+Graph 8
+---
+```{r}
+ed_sheeran_daily <- data %>%
+        filter(Country == "USA", Artist == "Ed Sheeran", Position <= 100)
+ed_20 <- ed_sheeran_daily %>%
+    group_by(`Track.Name`) %>%
+    summarise(n_daily = n()) %>%
+    filter(n_daily >= 20) %>%
+    select(`Track.Name`)
+ed_20 <- ed_20 %>% collect %>% .[["Track.Name"]]
+edData <- ed_sheeran_daily %>%
+  filter(`Track.Name` %in% ed_20)
+```
+
+
+```{r}
+shinyApp(
+  ui = fluidPage(
+    inputPanel(
+      selectInput("region", label = "Region",
+                  choices = c("NA"),
+                  selected = "United States of America")),
+    plotOutput("edSheeran")
+  ),
+  
+  server = function(input, output) {
+    # dataSub <- reactive({
+    #   ed_sheeran_daily <- data %>%
+    #     filter(Country == "USA", Artist == "Ed Sheeran", Position <= 100)
+    #   ed_20 <- ed_sheeran_daily %>%
+    #               group_by('Track.Name') %>%
+    #               summarise(n_daily = n()) %>%
+    #               filter(n_daily >= 20) %>%
+    #               select('Track.Name')
+    #   ed_20 <- ed_20 %>% collect %>% .[['Track.Name']]
+    #   ed_sheeran_daily %>%
+    #         filter(`Track Name` %in% ed_20)
+    # })
+    output$edSheeran <- renderPlot({
+      ggplot(edData, aes(x = as.Date(Date), y = Position, col = `Track.Name`)) + 
+        geom_point(alpha = 0.7, size = 3) +
+        scale_y_reverse(breaks = seq(0,100,10)) +
+        scale_x_date() +
+        ggtitle("Ed Sheeran on Top 100 Daily List in US") +
+        theme_bw() +
+        theme(plot.title = element_text(size = 14, face = "bold")) +
+        theme(legend.title=element_blank())
+    })},
   
   options = list(height = 550)
 )
