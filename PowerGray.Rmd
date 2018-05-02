@@ -39,7 +39,7 @@ library(gridExtra)
 + Check dimensions of the data, expecting a 3441197 x 7 dataframe
 + Return the first 5 rows
 ```{r}
-data = read.csv("data.csv")
+data = read.csv("data3.csv")
 
 dim(data)
 head(data, 5)
@@ -48,19 +48,6 @@ head(data, 5)
 
 Data Manipulation
 ===
-
-+ Write a `date.to.month()` helper function, which takes in a date in the form YEAR-MONTH-DAY and converts it to a month
-+ E.g. date.to.month(2017-01-26) returns January
-+ Apply `date.to.month()` across the `Date` column of our data, creating a new column `Month`
-```{r}
-date.to.month = function(date) {
-  date = as.character(date)
-  month.numeric = as.numeric(unlist(strsplit(date, "-")))[2]
-  return(month.name[month.numeric])
-}
-
-data$Month = sapply(data$Date, date.to.month)
-```
 
 + Create a vector of countries based off of the country codes that we have in our `Region` column
 + Write a `code.to.country()` function that takes in a country code and returns the country
@@ -232,7 +219,6 @@ shinyApp(
   
   server = function(input, output) {
     output$world_map <- renderPlotly({
-      
       rplot = ggplot() + 
         geom_polygon(data = coords, aes(x = long, y = lat, group = group), 
                      fill = "white") +
@@ -274,8 +260,8 @@ top15 = function(area, type) {
   flipped.cy = data.frame(t(cy[-1]))
   colnames(flipped.cy) = cy[, 1]
   
-  artists = rev(rownames(flipped.cy)[order(flipped.cy[,1], decreasing = TRUE)][1:15])
-  appearances = rev(flipped.cy[order(flipped.cy[,1], decreasing = TRUE),][1:15])
+  artists = rev(rownames(flipped.cy)[order(flipped.cy[,1], decreasing = TRUE)])
+  appearances = rev(flipped.cy[order(flipped.cy[,1], decreasing = TRUE),])
   
   return(data.frame(artists, appearances))
 }
