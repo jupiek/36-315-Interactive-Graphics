@@ -707,52 +707,42 @@ shinyApp(
 Graph 8
 ---
 ```{r}
-ed_sheeran_daily <- data %>%
-        filter(Country == "USA", Artist == "Ed Sheeran", Position <= 100)
-ed_20 <- ed_sheeran_daily %>%
-    group_by(`Track.Name`) %>%
-    summarise(n_daily = n()) %>%
-    filter(n_daily >= 20) %>%
-    select(`Track.Name`)
-ed_20 <- ed_20 %>% collect %>% .[["Track.Name"]]
-edData <- ed_sheeran_daily %>%
-  filter(`Track.Name` %in% ed_20)
-```
-
-
-```{r}
 shinyApp(
-  ui = fluidPage(
-    inputPanel(
-      selectInput("region", label = "Region",
-                  choices = c("NA"),
-                  selected = "United States of America")),
-    plotOutput("edSheeran")
+  ui =  fluidPage(
+          inputPanel(
+            selectInput("country8", label = "Country",
+                        choices = unique(data$Country),
+                        selected = "USA"),
+            
+            textInput("artist8", label = "Artist Name",
+                      value = "Ed Sheeran")
+          ),
+          plotOutput("artistSpec")
   ),
   
   server = function(input, output) {
-    # dataSub <- reactive({
-    #   ed_sheeran_daily <- data %>%
-    #     filter(Country == "USA", Artist == "Ed Sheeran", Position <= 100)
-    #   ed_20 <- ed_sheeran_daily %>%
-    #               group_by('Track.Name') %>%
-    #               summarise(n_daily = n()) %>%
-    #               filter(n_daily >= 20) %>%
-    #               select('Track.Name')
-    #   ed_20 <- ed_20 %>% collect %>data % .[['Track.Name']]
-    #   ed_sheeran_daily %>%
-    #         filter(`Track Name` %in% ed_20)
-    # })
-    output$edSheeran <- renderPlot({
-      ggplot(edData, aes(x = as.Date(Date), y = Position, col = `Track.Name`)) + 
-        geom_point(alpha = 0.7, size = 3) +
-        scale_y_reverse(breaks = seq(0,100,10)) +
-        scale_x_date() +
-        ggtitle("Ed Sheeran on Top 100 Daily List in US") +
-        theme_bw() +
-        theme(plot.title = element_text(size = 14, face = "bold")) +
-        theme(legend.title=element_blank())
-    })},
+   artistData8 <- reactive({
+    artist_daily <- data %>%
+      filter(Country == input$country8, Artist == input$artist8, Position <= 100)
+    artist_20 <- artist_daily %>%
+      group_by(`Track.Name`) %>%
+      summarise(n_daily = n()) %>%
+      filter(n_daily >= 20) %>%
+      select(`Track.Name`)
+    artist_20 <- artist_20 %>% collect %>% .[["Track.Name"]]
+    artist_daily %>% filter(`Track.Name` %in% artist_20)
+  })
+
+  output$artistSpec <- renderPlot({
+    ggplot(artistData8(), aes(x = as.Date(Date), y = Position, col = `Track.Name`)) +
+      geom_point(alpha = 0.7, size = 3) +
+      scale_y_reverse(breaks = seq(0, 100, 10)) +
+      scale_x_date() +
+      ggtitle("Artist on Top 100 Daily List in Country") +
+      theme_bw() +
+      theme(plot.title = element_text(size = 14, face = "bold")) +
+      theme(legend.title=element_blank())
+  })},
   
   options = list(height = 550)
 )
