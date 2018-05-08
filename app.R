@@ -346,7 +346,7 @@ ui <- dashboardPage(
       menuItem("Streaming Over Time", icon = icon("th"),
             menuSubItem("By Region", tabName = "time_by_region"),
             menuSubItem("Compare Two Countries", tabName = "time_by_country"),
-            menuSubItem("Artist on Top 200 Daily List", tabName = "time_200_list")),
+            menuSubItem("Artist on Top 100 Daily List", tabName = "time_200_list")),
       menuItem("Graph 5", tabName = "graph5", icon = icon("th"))
     )
   ),
