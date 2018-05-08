@@ -538,7 +538,7 @@ ui <- dashboardPage(
                         selected = "USA"),
             
             selectInput("artist8", label = "Artist Name",
-                        choices = sort(unique(artists)),
+                        choices = sort(unique(data$Artist)),
                         selected = "Ed Sheeran")
           ),
           plotlyOutput("artistSpec")
