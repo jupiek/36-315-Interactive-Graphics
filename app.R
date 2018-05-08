@@ -442,11 +442,11 @@ ui <- dashboardPage(
         fluidPage(
           inputPanel(
             selectInput("country1", label = "Country",
-                         choices = unique(data$Country),
+                         choices = sort(unique(data$Country)),
                          selected = "USA"),
 
             selectInput("country2", label = "Country 2",
-                        choices = unique(data$Country),
+                        choices = sort(unique(data$Country)),
                         selected = "Canada"),
 
             # textInput("songTime", label = "Song Name",
@@ -534,11 +534,11 @@ ui <- dashboardPage(
         fluidPage(
           inputPanel(
             selectInput("country8", label = "Country",
-                        choices = unique(data$Country),
+                        choices = sort(unique(data$Country)),
                         selected = "USA"),
             
             selectInput("artist8", label = "Artist Name",
-                        choices = unique(artists),
+                        choices = sort(unique(artists)),
                         selected = "Ed Sheeran")
           ),
           plotlyOutput("artistSpec")

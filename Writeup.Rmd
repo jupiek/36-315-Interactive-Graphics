@@ -1,7 +1,7 @@
 ---
-title: "36-315 Lab 10, Spring 2018"
+title: "36-315 Interactive Project Writeup, Spring 2018"
 author: "Austin Yu (zongchuy), Bryan Yan (bryanyan), Josh Huang (jzh1), Julie Kim (juliek1)"
-date: "Due Friday, April 27, 2018 (6:30pm) on Canvas"
+date: "Due Friday, May 11, 2018 (12:00pm) on Canvas"
 output: 
   html_document:
     toc:  true
@@ -14,35 +14,65 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-Data Overview
+Introduction
 ===
 
-**Title**
+**Worldwide Spotify Music Streaming**
 
-Spotify's Worldwide Daily Song Ranking
+Music streaming is ubiquitous. Currently, Spotify plays an important part on 
+that. However, we are very limited in what music we listen to based on where we 
+are located, and different regions listen to completely different songs and even 
+genres of music. We wanted to see how this differed across the globe.
 
-**Context**
+In this project, we attempt to answer questions such as
 
-Music streaming is ubiquitous. Currently, Spotify plays an important part on that. This dataset enable us to explore how artists and songs' popularity varies in time.
+* Do people listen to the same songs even if the country is far away from each
+other?
+* What is the most popular song based on region?
+* How long does a particular song stay in top 5/10/20?
+* How does the stream amount of a particular artist's song changed over time 
+between two countries?
 
-**Content**
+This dataset enables us to explore how artists and songs' popularity varies in 
+time across the world. The dataset contains the daily ranking of the 200 most
+listened songs in 53 countries from 2017 and 2018 by Spotify users. The original
+dataset contained more than 3 million rows, which comprised of 6629 artists and 
+18598 songs. However, this dataset was too large for us to deploy our 
+application on shinyapps, so we subsetted the data and used the Top 30 most 
+listened. Every row contains the song name, the position/ranking of the song, 
+the artist, the number of streams, the URL, the date the data point was 
+recorded, and the region. We wrote additional code to add columns for the month 
+and the country.
 
-This dataset contains the daily ranking of the 200 most listened songs in 53 countries from 2017 and 2018 by Spotify users. Each row contains a ranking position on a specific day for a song. It contains more than 3 million rows, which comprises 6629 artists, 18598 songs for a total count of one hundred five billion streams count.
+Data Source: https://www.kaggle.com/edumucelli/spotifys-worldwide-daily-song-ranking
 
-The data spans from 1st January 2017 to 9th January 2018 and will be kept up-to-date on following versions. It has been collected from Spotify's regional chart data.
 
-**Inspiration**
+Example Walkthrough
+===
 
-Can you predict what is the rank position or the number of streams a song will have in the future?
-How long do songs "resist" on the top 3, 5, 10, 20 ranking?
-What are the signs of a song that gets into the top rank to stay?
-Do continents share same top ranking artists or songs?
-Are people listening to the very same top ranking songs on countries far away from each other?
-How long time does a top ranking song takes to get into the ranking of neighbor countries?
+Design Choices
+===
 
-**Questions**
+Appendix
+===
 
-1) Do people listen to the same songs even if the country is far away from each other?
-2) What is the most popular song based on region?
-3) How long does a particular song stay in top 5/10/20?
-4) Given a top ranking song in a particular region, how long before a neighboring country has the same song in its top rankings?
+Based on feedback we received, we revised various aspects of our draft app. Our
+intial draft didn't really include any textual explanations of the graph,
+and the user was left to form a story for him/herself. Adding a clear, 
+multifaceted message or purpose while using graphs, interactions, and text to
+support and answer the questions we wanted to explore gave users more of
+an insight as to what we were doing and also allowed them to explore any
+questions that might have had as well. We also changed our application to load 
+all objects that we needed and pre-saved rather than process them everytime 
+the application ran, speeding things up considerably. 
+
+For the graphs that previously took in textual input, we changed these to become
+alphabetically sorted dropdown selections. We did this because although the 
+textual input is cool, the user doesn't actually know what songs or artists are
+contained in the dataset. Doing this gives the user a much better experience so 
+that they don't see 'No Results Found' all the time. We also added plotly to the
+time series plots so that users could examine the points more and could really 
+examine a specific time frame if they wanted. 
+
+
+
