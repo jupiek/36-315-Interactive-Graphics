@@ -12,7 +12,7 @@ library(scales)
 library(gridExtra)
 library(shinydashboard)
 
-load("test.RData")
+load("shiny_ed_fullData.RData")
 
 
 # SHINY APP CODE
@@ -24,6 +24,7 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
+      menuItem("Graph 1", tabName = "graph1", icon = icon("th")),
       menuItem("Graph 2", tabName = "graph2", icon = icon("th")),
       menuItem("Graph 3", tabName = "graph3", icon = icon("th")),
       menuItem("Graph 4", tabName = "graph4", icon = icon("th")),
@@ -35,117 +36,120 @@ ui <- dashboardPage(
   ),
   dashboardBody(
     tabItems(
+      # Dashboard content
+      tabItem(tabName = "dashboard"),
+      
       # First tab content
-      tabItem(tabName = "dashboard",
-        fluidPage(
-          inputPanel(
-            radioButtons("variable", label = "Fill Variable:",
-              choiceNames = c("Number of Streams", "Number of Tracks", 
-                              "Number of Artists"),
-              choiceValues = c("Total_Streams", "N_Tracks", "N_Artists"))
-          ),
-          plotlyOutput("world_map")
-        )
+      tabItem(tabName = "graph1",
+              fluidPage(
+                inputPanel(
+                  radioButtons("variable", label = "Fill Variable:",
+                               choiceNames = c("Number of Streams", "Number of Tracks", 
+                                               "Number of Artists"),
+                               choiceValues = c("Total_Streams", "N_Tracks", "N_Artists"))
+                ),
+                plotlyOutput("world_map")
+              )
       ),
       
       # Second tab content
       tabItem(tabName = "graph2",
-        fluidPage(
-          inputPanel(
-            selectInput("country", label = "Country:",
-              choices = sort(names(countries)), selected = "Asia")
-          ),
-          plotOutput("cplot")
-        )
+              fluidPage(
+                inputPanel(
+                  selectInput("country", label = "Country:",
+                              choices = sort(names(countries)), selected = "Asia")
+                ),
+                plotOutput("cplot")
+              )
       ),
       
       # Third tab content
       tabItem(tabName = "graph3",
-        fluidPage(
-          inputPanel(
-            selectInput("country1", label = "Country",
-                         choices = unique(data$Country), 
-                         selected = "USA"),
+              fluidPage(
+                inputPanel(
+                  selectInput("country1", label = "Country",
+                              choices = unique(data$Country), 
+                              selected = "USA"),
                   
-            selectInput("country2", label = "Country 2",
-                        choices = unique(data$Country),
-                        selected = "Canada"),
+                  selectInput("country2", label = "Country 2",
+                              choices = unique(data$Country),
+                              selected = "Canada"),
                   
-            textInput("songTime", label = "Song Name", 
-                      value = "rockstar"),
+                  textInput("songTime", label = "Song Name", 
+                            value = "rockstar"),
                   
-            textInput("artistTime", label = "Artist Name", 
-                      value = "Post Malone")
-          ),
-          plotOutput("streams_over_time")
-        )
+                  textInput("artistTime", label = "Artist Name", 
+                            value = "Post Malone")
+                ),
+                plotOutput("streams_over_time")
+              )
       ),
       
       # Fourth tab content
       tabItem(tabName = "graph4",
-        fluidPage(
-          inputPanel(
-            selectInput("region", label = "Region:",
-                choices = c("North America", "South America", "Central America",
-                      "Asia", "Europe", "Oceania"), selected = "North America"),
+              fluidPage(
+                inputPanel(
+                  selectInput("region", label = "Region:",
+                              choices = c("North America", "South America", "Central America",
+                                          "Asia", "Europe", "Oceania"), selected = "North America"),
                   
-            sliderInput("top_n", label = "Top n songs by days on top 5",
-                         min = 5, max = 50, value = 10, step = 5)
-          ),
-          plotlyOutput("top_songs_plot")
-        )
+                  sliderInput("top_n", label = "Top n songs by days on top 5",
+                              min = 5, max = 50, value = 10, step = 5)
+                ),
+                plotlyOutput("top_songs_plot")
+              )
       ),
       
       # Fifth tab content
       tabItem(tabName = "graph5",
-        fluidPage(
-          inputPanel(
-            selectInput("region5", label = "Region:",
-                  choices = c("North America" = "na", "South America" = "sa", 
-                              "Central America" = "ca", "Asia" = "asia", 
-                              "Europe" = "europe", "Oceania" = "oceania"), 
-                  selected = "na"),
+              fluidPage(
+                inputPanel(
+                  selectInput("region5", label = "Region:",
+                              choices = c("North America" = "na", "South America" = "sa", 
+                                          "Central America" = "ca", "Asia" = "asia", 
+                                          "Europe" = "europe", "Oceania" = "oceania"), 
+                              selected = "na"),
                   
-            selectInput("artist5", label = "Artist:",
-                  choices = unique(top.songs.na.grouped$Artist), 
-                  selected = "Ed Sheeran")
+                  selectInput("artist5", label = "Artist:",
+                              choices = unique(top.songs.na.grouped$Artist), 
+                              selected = "Ed Sheeran")
                   
-          ),
-          plotlyOutput("top_artist_prop_plot")
-        )
+                ),
+                plotlyOutput("top_artist_prop_plot")
+              )
       ),
       
       # Sixth tab content
       tabItem(tabName = "graph6",
-        fluidPage(
-          inputPanel(
-            selectInput("region6", label = "Region",
-                        choices = c("North America", "South America", 
-                                    "Central America",
-                                    "Asia", "Europe", "Oceania"), 
-                        selected = "North America")),
-          plotOutput("top_songs")
-        )            
+              fluidPage(
+                inputPanel(
+                  selectInput("region6", label = "Region",
+                              choices = c("North America", "South America", 
+                                          "Central America",
+                                          "Asia", "Europe", "Oceania"), 
+                              selected = "North America")),
+                plotOutput("top_songs")
+              )            
       ),
       
       # Seventh tab content
       tabItem(tabName = "graph7",
-        fluidPage(
-          inputPanel(
-            selectInput("region7", label = "Region",
-                        choices = c("North America", "South America", 
-                                    "Central America",
-                                    "Asia", "Europe", "Oceania"), 
-                        selected = "North America")),
-          plotOutput("songs_time")
-        )
+              fluidPage(
+                inputPanel(
+                  selectInput("region7", label = "Region",
+                              choices = c("North America", "South America", 
+                                          "Central America",
+                                          "Asia", "Europe", "Oceania"), 
+                              selected = "North America")),
+                plotOutput("songs_time")
+              )
       ),
       
       # Eighth tab content
       tabItem(tabName = "graph8",
-        fluidPage(
-          plotOutput("edSheeran")
-        )        
+              fluidPage(
+                plotOutput("edSheeran")
+              )        
       )
       
       
@@ -167,7 +171,6 @@ server <- function(input, output, session) {
                                                    group = "group",
                                                    fill = input$variable)) + 
       scale_fill_distiller(palette = "Spectral") +
-      
       labs(title = "Top 30 ranking Spotify tracks worldwide",
            x = "", 
            y = "") +
@@ -211,7 +214,7 @@ server <- function(input, output, session) {
            x = "Artist", y = "Number of Appearances")
     
     p <- grid.arrange(grobs = list(rplot1, rplot2), nrow = 1, 
-                 top = "Top 15 Artists Spotify by Country\ncompared with continent")
+                      top = "Top 15 Artists Spotify by Country\ncompared with continent")
     print(p)
   })
   
@@ -257,7 +260,7 @@ server <- function(input, output, session) {
   # Graph 4
   output$top_songs_plot <- renderPlotly({
     p <- ggplot(eval(parse(text = paste("cum.table$", "'", input$region, "'",
-                sep = "")))[1:input$top_n,], aes(x = Track.Name, y = freq)) + 
+                                        sep = "")))[1:input$top_n,], aes(x = Track.Name, y = freq)) + 
       geom_bar(stat = "identity") + 
       labs(title = "Amount of Days Song has been in Top 5 Rankings in 2017", 
            x = "Song Name", y = "Number of Days", 
@@ -271,16 +274,16 @@ server <- function(input, output, session) {
   observe({
     x <- input$region5
     updateSelectInput(session, "artist5", 
-      choices = unique(eval(parse(text = paste("top.songs.", 
-              input$region5, ".grouped$Artist", sep = "")))), 
-              selected = "Ed Sheeran")
+                      choices = unique(eval(parse(text = paste("top.songs.", 
+                                                               input$region5, ".grouped$Artist", sep = "")))), 
+                      selected = "Ed Sheeran")
   })
   
   output$top_artist_prop_plot <- renderPlotly({
     p <- ggplot(eval(parse(text = paste("top.songs.", input$region5, ".grouped",
-            sep = "")))[eval(parse(text = paste("top.songs.", 
-              input$region5, ".grouped$Artist", sep = ""))) == input$artist5,], 
-            aes(x = Track, y = Streams)) + 
+                                        sep = "")))[eval(parse(text = paste("top.songs.", 
+                                                                            input$region5, ".grouped$Artist", sep = ""))) == input$artist5,], 
+                aes(x = Track, y = Streams)) + 
       geom_bar(aes(x = factor(1), fill = Track), stat = "identity",
                width = .5)
     ggplotly(p)
