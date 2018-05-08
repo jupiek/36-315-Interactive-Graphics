@@ -347,7 +347,8 @@ ui <- dashboardPage(
             menuSubItem("By Region", tabName = "time_by_region"),
             menuSubItem("Compare Two Countries", tabName = "time_by_country"),
             menuSubItem("Artist on Top 200 Daily List", tabName = "time_200_list")),
-      menuItem("Graph 5", tabName = "graph5", icon = icon("th"))
+      menuItem("Artist Song Proportions", tabName = "artist_prop_song", 
+               icon = icon("th"))
     )
   ),
   dashboardBody(
@@ -464,6 +465,12 @@ ui <- dashboardPage(
       
       # Fourth tab content
       tabItem(tabName = "top_song_day",
+              h2("Top Songs by Number of Days in Top 5"),
+              p("Here we see the top songs of a region in terms of how many 
+                      days they remained in the top 5."),
+              br(),
+              p("You can pick the region that you are interested in and adjust
+                the top n songs that you would like displayed."),
               fluidPage(
                 inputPanel(
                   selectInput("region", label = "Region:",
@@ -478,7 +485,14 @@ ui <- dashboardPage(
       ),
       
       # Fifth tab content
-      tabItem(tabName = "graph5",
+      tabItem(tabName = "artist_prop_song",
+              h2("Artist Song Proportions"),
+              p("On this page we can view what songs comprise of the artist's
+                        total stream and what proportion does each song take"),
+              br(),
+              p("When changing the region, the dropdown options for artists
+                will automatically change to only include those that are in that
+                subset of the data."),
               fluidPage(
                 inputPanel(
                   selectInput("region5", label = "Region:",
@@ -676,7 +690,7 @@ server <- function(input, output, session) {
   output$top_songs_plot <- renderPlot({
     p <- ggplot(eval(parse(text = paste("cum.table$", "'", input$region, "'",
                   sep = "")))[1:input$top_n,], aes(x = Track.Name, y = freq)) +
-      geom_bar(stat = "identity", fill = "lightcoral") +
+      geom_bar(stat = "identity", fill = "green") +
       labs(title = "Amount of Days Song has been in Top 5 Rankings in 2017",
            x = "Song Name", y = "Number of Days") + 
       coord_flip()
