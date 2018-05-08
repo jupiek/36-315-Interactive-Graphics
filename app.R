@@ -340,7 +340,7 @@ ui <- dashboardPage(
       menuItem("Introduction", tabName = "introduction", icon = icon("dashboard")),
       menuItem("Overview", tabName = "overview", icon = icon("th")),
       menuItem("Top Songs", icon = icon("th"),
-            menuSubItem("Based on Country", tabName = "top_song_country"),
+            menuSubItem("Based on Streams", tabName = "top_song_stream"),
             menuSubItem("Based on Days in Top 5", tabName = "top_song_day")),
       menuItem("Country vs Region", tabName = "country_v_region", icon = icon("th")),
       menuItem("Streaming Over Time", icon = icon("th"),
@@ -511,7 +511,7 @@ ui <- dashboardPage(
       ),
       
       # Sixth tab content
-      tabItem(tabName = "top_song_country",
+      tabItem(tabName = "top_song_stream",
               fluidPage(
                 inputPanel(
                   selectInput("region6", label = "Region",

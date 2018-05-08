@@ -50,14 +50,65 @@ Data Source: https://www.kaggle.com/edumucelli/spotifys-worldwide-daily-song-ran
 Example Walkthrough
 ===
 
+Overview map graph - 
+
+Top songs (based on streams) - 
+
+Top songs (based on days in top 5) - This graph is a bar chart showing the 
+number of days that a song has been in the top 5. The user can select which 
+region he/she would like to look at as well as the top n number of songs to 
+appear on the graph. With this, we can see a number of things such as how many
+days do the top songs stay at the top and whether this is different depending
+on the region. 
+
+Country vs region - 
+
+Streaming over time (by region) - 
+
+Streaming over time (compare two countries) - 
+
+Streaming over time (artist on top 200 daily list) - 
+
+Artist song proportions - Here we have a stacked bar chart that is filled with
+the amount of streams a particular song has. All the songs that appear belong
+to the artist selected and so we are able to see how much more popular one 
+song is compared to another in that region. This graph can be useful as if 
+shows a more in-depth view of how successful a particular artist is. From the 
+previous graphs we might be able to tell that an artist has a total of x 
+number of streams, but that only shows the total stream count. This graph allows
+us to see specifically which of his songs comprise of the most streams.
+
 Design Choices
 ===
+
+Overview map graph - 
+
+Top songs (based on streams) - 
+
+Top songs (based on days in top 5) - As this graph only contained one variable,
+it was logical to use a bar chart to effectively show the data. We flipped the
+x and y axis so that the bars were horizontal so that the song name's would not
+overlap with each other. 
+
+Country vs region - 
+
+Streaming over time (by region) - 
+
+Streaming over time (compare two countries) - 
+
+Streaming over time (artist on top 200 daily list) - 
+
+Artist song proportions - We decided to use a stacked bar chart because we 
+believed it would show not only the proportions, but also the specific stream
+count. In addition, we added the plotly features so that the user can mouse
+over a particular portion to see the exact amount of streams that portion 
+accounts for. 
 
 Appendix
 ===
 
 Based on feedback we received, we revised various aspects of our draft app. Our
-intial draft didn't really include any textual explanations of the graph,
+initial draft didn't really include any textual explanations of the graph,
 and the user was left to form a story for him/herself. Adding a clear, 
 multifaceted message or purpose while using graphs, interactions, and text to
 support and answer the questions we wanted to explore gave users more of
