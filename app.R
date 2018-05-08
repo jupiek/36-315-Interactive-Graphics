@@ -333,29 +333,74 @@ load("draft.RData")
 
 
 ui <- dashboardPage(
-  dashboardHeader(title = "Basic dashboard"),
+  dashboardHeader(title = "Spotify"),
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
-      menuItem("Graph 1", tabName = "graph1", icon = icon("th")),
-      menuItem("Graph 2", tabName = "graph2", icon = icon("th")),
-      menuItem("Graph 3", tabName = "graph3", icon = icon("th")),
-      menuItem("Graph 4", tabName = "graph4", icon = icon("th")),
+      menuItem("Introduction", tabName = "introduction", icon = icon("dashboard")),
+      menuItem("Overview", tabName = "overview", icon = icon("th")),
+      menuItem("Top Songs", icon = icon("th"),
+            menuSubItem("Based on Country", tabName = "top_song_country"),
+            menuSubItem("Based on Days in Top 5", tabName = "top_song_day")),
+      menuItem("Country vs Region", tabName = "country_v_region", icon = icon("th")),
       menuItem("Graph 5", tabName = "graph5", icon = icon("th")),
-      menuItem("Graph 6", tabName = "graph6", icon = icon("th")),
+      menuItem("Graph 3", tabName = "graph3", icon = icon("th")),
       menuItem("Graph 7", tabName = "graph7", icon = icon("th")),
       menuItem("Graph 8", tabName = "graph8", icon = icon("th"))
     )
   ),
   dashboardBody(
     tabItems(
-
-      tabItem(tabName = "dashboard"),
+      
+      tabItem(tabName = "introduction",
+            h2("Introduction"),
+            br(),
+            p("Music streaming has become the new way of listening to music 
+                  and Spotify has become one of the most successful platforms 
+                  for such a service. With so many people on a single platform 
+                  comes the possibility to analyze listening behaviors to study
+                  the spread of music."),
+            br(),
+            p("In this project, we attempt to answer some questions such 
+                  as:"),
+            p("  - How do artists do in a particular country as compared
+              to that continent?"),
+            p("  - How does the stream amount of a particular artist's song 
+              changed over time between two countries?"),
+            p("  - In a specific region, how many days have the top songs
+              stayed at the top?"),
+            p("  - In a specific region, what songs comprise of the artist's
+              total stream and what proportion does each song take?"),
+            p("  - In a specific region, what are the top songs by stream
+              count?"),
+            p("  - How has the total amount of streams changed over time in a 
+              particular region."),
+            p("  - How has an artist's top songs changed in their position
+              throughout the year."),
+            br(),
+            p("Dataset from: ", 
+  a("https://www.kaggle.com/edumucelli/spotifys-worldwide-daily-song-ranking"))
+      ),
       
       # First tab content
-      tabItem(tabName = "graph1",
+      tabItem(tabName = "overview",
+              h2("Overview"),
+              p("A map overview of the countries that we have data for and
+                the amount of streams, tracks, and artists for those 
+                countries"),
               fluidPage(
                 inputPanel(
+                  p("The world map below represents data for the countries that
+                    are contained within the Spotify dataset. The white 
+                    countries lack data, while the rest of the countries are 
+                    colored by the selected variable."),
+                  p("'Number of Streams' depicts the number of streams in each 
+                    country. `Number of Tracks` and `Number of Artists` depict 
+                    the number of tracks and artists listened to in each 
+                    country"),
+                  p("We would expect that countries that have larger numbers of
+                    artists and tracks have more variety in their top Spotify 
+                    charts."),
+                  
                   radioButtons("variable", label = "Fill Variable:",
                                choiceNames = c("Number of Streams", "Number of Tracks", 
                                                "Number of Artists"),
@@ -366,16 +411,16 @@ ui <- dashboardPage(
       ),
       
       # Second tab content
-      tabItem(tabName = "graph2",
-        fluidPage(
-          inputPanel(
-            selectInput("country", label = "Country:",
-              choices = sort(names(countries)), selected = "Asia")
-          ),
-          plotOutput("cplot")
-        )
+      tabItem(tabName = "country_v_region",
+              fluidPage(
+                inputPanel(
+                  selectInput("country", label = "Country:",
+                              choices = sort(names(countries)), selected = "Asia")
+                ),
+                plotOutput("cplot")
+              )
       ),
-
+      
       # Third tab content
       tabItem(tabName = "graph3",
         fluidPage(
@@ -399,67 +444,67 @@ ui <- dashboardPage(
           plotOutput("streams_over_time")
         )
       ),
-
+      
       # Fourth tab content
-      tabItem(tabName = "graph4",
-        fluidPage(
-          inputPanel(
-            selectInput("region", label = "Region:",
+      tabItem(tabName = "top_song_day",
+              fluidPage(
+                inputPanel(
+                  selectInput("region", label = "Region:",
                 choices = c("North America", "South America", "Central America",
                       "Asia", "Europe", "Oceania"), selected = "North America"),
-
-            sliderInput("top_n", label = "Top n songs by days on top 5",
-                         min = 5, max = 50, value = 10, step = 5)
-          ),
-          plotlyOutput("top_songs_plot")
-        )
+                  
+                  sliderInput("top_n", label = "Top n songs by days on top 5",
+                              min = 5, max = 50, value = 10, step = 5)
+                ),
+                plotOutput("top_songs_plot")
+              )
       ),
-
+      
       # Fifth tab content
       tabItem(tabName = "graph5",
-        fluidPage(
-          inputPanel(
-            selectInput("region5", label = "Region:",
-                  choices = c("North America" = "na", "South America" = "sa",
-                              "Central America" = "ca", "Asia" = "asia",
-                              "Europe" = "europe", "Oceania" = "oceania"),
-                  selected = "na"),
-
-            selectInput("artist5", label = "Artist:",
-                  choices = unique(top.songs.na.grouped$Artist),
-                  selected = "Ed Sheeran")
-
-          ),
-          plotlyOutput("top_artist_prop_plot")
-        )
+              fluidPage(
+                inputPanel(
+                  selectInput("region5", label = "Region:",
+                    choices = c("North America" = "na", "South America" = "sa",
+                                  "Central America" = "ca", "Asia" = "asia",
+                                  "Europe" = "europe", "Oceania" = "oceania"),
+                            selected = "na"),
+                  
+                  selectInput("artist5", label = "Artist:",
+                              choices = unique(top.songs.na.grouped$Artist),
+                              selected = "Ed Sheeran")
+                  
+                ),
+                plotlyOutput("top_artist_prop_plot")
+              )
       ),
-
+      
       # Sixth tab content
-      tabItem(tabName = "graph6",
-        fluidPage(
-          inputPanel(
-            selectInput("region6", label = "Region",
-                        choices = c("North America", "South America",
-                                    "Central America",
-                                    "Asia", "Europe", "Oceania"),
-                        selected = "North America")),
-          plotOutput("top_songs")
-        )
+      tabItem(tabName = "top_song_country",
+              fluidPage(
+                inputPanel(
+                  selectInput("region6", label = "Region",
+                              choices = c("North America", "South America",
+                                          "Central America",
+                                          "Asia", "Europe", "Oceania"),
+                              selected = "North America")),
+                plotOutput("top_songs")
+              )
       ),
-
+      
       # Seventh tab content
       tabItem(tabName = "graph7",
-        fluidPage(
-          inputPanel(
-            selectInput("region7", label = "Region",
-                        choices = c("North America", "South America",
-                                    "Central America",
-                                    "Asia", "Europe", "Oceania"),
-                        selected = "North America")),
-          plotOutput("songs_time")
-        )
+              fluidPage(
+                inputPanel(
+                  selectInput("region7", label = "Region",
+                              choices = c("North America", "South America",
+                                          "Central America",
+                                          "Asia", "Europe", "Oceania"),
+                              selected = "North America")),
+                plotOutput("songs_time")
+              )
       ),
-
+      
       # Eighth tab content
       tabItem(tabName = "graph8",
         fluidPage(
@@ -517,31 +562,31 @@ server <- function(input, output, session) {
   
   # Graph 2
   output$cplot <- renderPlot({
-
+    
     cy = top15(input$country, "country")
     cy$artists = factor(cy$artists, levels = cy$artists)
-
+    
     rplot1 = ggplot(cy, aes(x = artists, y = appearances)) +
       geom_bar(stat = "identity", fill = "lightcoral") +
       coord_flip() +
       labs(title = input$country,
            x = "Artist", y = "Number of Appearances")
-
+    
     cont = country.to.continent(input$country)
     ct = top15(cont, "cont")
     ct$artists = factor(ct$artists, levels = ct$artists)
-
+    
     rplot2 = ggplot(ct, aes(x = artists, y = appearances)) +
       geom_bar(stat = "identity", fill = "lightcoral") +
       coord_flip() +
       labs(title = cont,
            x = "Artist", y = "Number of Appearances")
-
+    
     p <- grid.arrange(grobs = list(rplot1, rplot2), nrow = 1,
-                 top = "Top 15 Artists Spotify by Country\ncompared with continent")
+                      top = "Top 15 Artists Spotify by Country\ncompared with continent")
     print(p)
   })
-
+  
   # Graph 3
   
   output$artistTime <- renderUI({
@@ -574,7 +619,7 @@ server <- function(input, output, session) {
              Artist == input$artistTime &
              (Country == input$country1 | Country == input$country2))
   })
-
+  
   output$streams_over_time <- renderPlot({
     subsetOfData <- dataSub()
     if (nrow(subsetOfData) == 0) {
@@ -601,40 +646,39 @@ server <- function(input, output, session) {
                 element_text(margin = margin(t = 20)))
     }
   })
-
+  
   # Graph 4
-  output$top_songs_plot <- renderPlotly({
+  output$top_songs_plot <- renderPlot({
     p <- ggplot(eval(parse(text = paste("cum.table$", "'", input$region, "'",
-                sep = "")))[1:input$top_n,], aes(x = Track.Name, y = freq)) +
-      geom_bar(stat = "identity") +
+                  sep = "")))[1:input$top_n,], aes(x = Track.Name, y = freq)) +
+      geom_bar(stat = "identity", fill = "lightcoral") +
       labs(title = "Amount of Days Song has been in Top 5 Rankings in 2017",
-           x = "Song Name", y = "Number of Days",
-           caption = "Source: Spotify's Worldwide Daily Song Ranking") +
-      theme(axis.text.x = element_text(angle = 25))
-
-    ggplotly(p)
+           x = "Song Name", y = "Number of Days") + 
+      coord_flip()
+    
+    p
   })
-
+  
   # Graph 5
   observe({
     x <- input$region5
     updateSelectInput(session, "artist5",
-      choices = unique(eval(parse(text = paste("top.songs.",
-              input$region5, ".grouped$Artist", sep = "")))),
-              selected = "Ed Sheeran")
+                      choices = unique(eval(parse(text = paste("top.songs.",
+                           input$region5, ".grouped$Artist", sep = "")))),
+                      selected = "Ed Sheeran")
   })
-
+  
   output$top_artist_prop_plot <- renderPlotly({
     p <- ggplot(eval(parse(text = paste("top.songs.", input$region5, ".grouped",
-            sep = "")))[eval(parse(text = paste("top.songs.",
+                            sep = "")))[eval(parse(text = paste("top.songs.",
               input$region5, ".grouped$Artist", sep = ""))) == input$artist5,],
-            aes(x = Track, y = Streams)) +
+                aes(x = Track, y = Streams)) +
       geom_bar(aes(x = factor(1), fill = Track), stat = "identity",
-               width = .5)
+               width = .5) + scale_y_continuous(labels = comma)
     ggplotly(p)
   })
-
-
+  
+  
   # Graph 6
   dataSub6 <- reactive({
     data.c = data[which(data$Region == input$region6),]
@@ -653,7 +697,7 @@ server <- function(input, output, session) {
             axis.title.x =
               element_text(margin = margin(t = 20)))
   })
-
+  
   # Graph 7
   dataSub7 <- reactive({
     data.d = data[which(data$Region == input$region7),]
@@ -670,7 +714,7 @@ server <- function(input, output, session) {
             axis.title.x =
               element_text(margin = margin(t = 20)))
   })
-
+  
   # Graph 8
   
   artistData8 <- reactive({
@@ -684,7 +728,7 @@ server <- function(input, output, session) {
     artist_20 <- artist_20 %>% collect %>% .[["Track.Name"]]
     artist_daily %>% filter(`Track.Name` %in% artist_20)
   })
-
+  
   output$artistSpec <- renderPlot({
     ggplot(artistData8(), aes(x = as.Date(Date), y = Position, col = `Track.Name`)) +
       geom_point(alpha = 0.7, size = 3) +
