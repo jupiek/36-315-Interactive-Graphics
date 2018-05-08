@@ -333,7 +333,8 @@ load("draft.RData")
 
 
 ui <- dashboardPage(
-  dashboardHeader(title = "Spotify"),
+  skin = "green",
+  dashboardHeader(title = "Spotify Music Streaming"),
   dashboardSidebar(
     sidebarMenu(
       menuItem("Introduction", tabName = "introduction", icon = icon("dashboard")),
@@ -342,10 +343,11 @@ ui <- dashboardPage(
             menuSubItem("Based on Country", tabName = "top_song_country"),
             menuSubItem("Based on Days in Top 5", tabName = "top_song_day")),
       menuItem("Country vs Region", tabName = "country_v_region", icon = icon("th")),
-      menuItem("Graph 5", tabName = "graph5", icon = icon("th")),
-      menuItem("Graph 3", tabName = "graph3", icon = icon("th")),
-      menuItem("Graph 7", tabName = "graph7", icon = icon("th")),
-      menuItem("Graph 8", tabName = "graph8", icon = icon("th"))
+      menuItem("Streaming Over Time", icon = icon("th"),
+            menuSubItem("By Region", tabName = "time_by_region"),
+            menuSubItem("Compare Two Countries", tabName = "time_by_country"),
+            menuSubItem("Artist on Top 200 Daily List", tabName = "time_200_list")),
+      menuItem("Graph 5", tabName = "graph5", icon = icon("th"))
     )
   ),
   dashboardBody(
@@ -378,7 +380,9 @@ ui <- dashboardPage(
               throughout the year."),
             br(),
             p("Dataset from: ", 
-  a("https://www.kaggle.com/edumucelli/spotifys-worldwide-daily-song-ranking"))
+  a("https://www.kaggle.com/edumucelli/spotifys-worldwide-daily-song-ranking")),
+            br(),
+            p("By: Julie Kim, Austin Yu, Joshua Huang, Bryan Yan")
       ),
       
       # First tab content
@@ -422,7 +426,19 @@ ui <- dashboardPage(
       ),
       
       # Third tab content
-      tabItem(tabName = "graph3",
+      tabItem(tabName = "time_by_country",
+        h2("Song Streams Over Time by Country"),
+        p("Now that you've seen how song streaming changes by region, we
+          also wanted to see how song streams change by country and for
+          specific songs. This gives us some insight as to what
+          songs different countries are listening to and how this compares
+          to other countries."),
+        br(),
+        p("Selecting an artist will change which songs you can
+           select from. Depending on the song/artist selection along with the
+           countries selected, you may only get results for 1 country 
+          (if no results for the other country were found) or no results at 
+          all for both countries."),
         fluidPage(
           inputPanel(
             selectInput("country1", label = "Country",
@@ -439,9 +455,10 @@ ui <- dashboardPage(
             #             choices = unique(artists),
             #             selected = "Post Malone"),
             htmlOutput("artistTime"),
-            htmlOutput("songTime")
+            htmlOutput("songTime"),
+            br()
           ),
-          plotOutput("streams_over_time")
+          plotlyOutput("streams_over_time")
         )
       ),
       
@@ -493,7 +510,7 @@ ui <- dashboardPage(
       ),
       
       # Seventh tab content
-      tabItem(tabName = "graph7",
+      tabItem(tabName = "time_by_region",
               fluidPage(
                 inputPanel(
                   selectInput("region7", label = "Region",
@@ -506,7 +523,14 @@ ui <- dashboardPage(
       ),
       
       # Eighth tab content
-      tabItem(tabName = "graph8",
+      tabItem(tabName = "time_200_list",
+        h2("Artist Performance Over Time"),
+        p("Now that we've seen how overall streaming numbers were, let's focus
+          on the artists. How long did specific songs stay on the Top 100
+          list? We'll look at how artists have performed on this list and
+          maybe see if we can find reasons for spikes during specific
+          times on the charts. If the artist was never on the Top 100 list,
+          then you'll receive no visual results."),
         fluidPage(
           inputPanel(
             selectInput("country8", label = "Country",
@@ -517,7 +541,7 @@ ui <- dashboardPage(
                         choices = unique(artists),
                         selected = "Ed Sheeran")
           ),
-          plotOutput("artistSpec")
+          plotlyOutput("artistSpec")
         )
       )
       
@@ -540,7 +564,7 @@ server <- function(input, output, session) {
                                                    group = "group",
                                                    fill = input$variable)) + 
       scale_fill_distiller(palette = "Spectral") +
-      labs(title = "Top 30 ranking Spotify tracks worldwide",
+      labs(title = "Top 30 Ranking Spotify Tracks Worldwide",
            x = "", 
            y = "") +
       theme(panel.background = element_rect(fill = "darkgrey"),
@@ -620,10 +644,10 @@ server <- function(input, output, session) {
              (Country == input$country1 | Country == input$country2))
   })
   
-  output$streams_over_time <- renderPlot({
+  output$streams_over_time <- renderPlotly({
     subsetOfData <- dataSub()
     if (nrow(subsetOfData) == 0) {
-      ggplot() +
+      p <- ggplot() +
         annotate("text",
                  x = 4, y = 25, size = 8, label = "No Results for 
                  Input Combination") +
@@ -631,9 +655,9 @@ server <- function(input, output, session) {
         labs(x = NULL, y = NULL)
     }
     else {
-      ggplot(subsetOfData, aes(x = as.Date(Date), y = Streams,
+      p <- ggplot(subsetOfData, aes(x = as.Date(Date), y = Streams,
                                color = Country, group = Country)) +
-        scale_x_date(date_labels = "%b %y") +
+        scale_x_date(date_labels = "%b %d %y") +
         scale_y_continuous(labels = comma) +
         geom_point() +
         geom_line() +
@@ -641,10 +665,11 @@ server <- function(input, output, session) {
              x = "Date",
              y = "Number of Streams") +
         theme(axis.title.y =
-                element_text(margin = margin(r = 20)),
+                element_text(margin = margin(r = 50)),
               axis.title.x =
                 element_text(margin = margin(t = 20)))
     }
+    ggplotly(p)
   })
   
   # Graph 4
@@ -719,7 +744,7 @@ server <- function(input, output, session) {
   
   artistData8 <- reactive({
     artist_daily <- data %>%
-      filter(Country == input$country8, Artist == input$artist8, Position <= 200)
+      filter(Country == input$country8, Artist == input$artist8, Position <= 100)
     artist_20 <- artist_daily %>%
       group_by(`Track.Name`) %>%
       summarise(n_daily = n()) %>%
@@ -729,16 +754,26 @@ server <- function(input, output, session) {
     artist_daily %>% filter(`Track.Name` %in% artist_20)
   })
   
-  output$artistSpec <- renderPlot({
-    ggplot(artistData8(), aes(x = as.Date(Date), y = Position, col = `Track.Name`)) +
+  output$artistSpec <- renderPlotly({
+    subData <- artistData8()
+    if (nrow(subData) == 0) {
+      p <- ggplot() +
+        annotate("text",
+                 x = 4, y = 25, size = 8, label = "No Results") +
+        theme_void() +
+        labs(x = NULL, y = NULL)
+    }
+    else {
+    p <- ggplot(subData, aes(x = as.Date(Date), y = Position, col = `Track.Name`)) +
       geom_point(alpha = 0.7, size = 3) +
       geom_line() +
       scale_y_reverse(breaks = seq(0, 100, 10)) +
-      scale_x_date(date_breaks = "3 month", date_minor_breaks = "3 month", date_labels = "%B") +
-      ggtitle("Artist on Top 200 Daily List in Country") +
-      theme_bw() +
-      theme(plot.title = element_text(size = 14, face = "bold")) +
-      theme(legend.title=element_blank())
+      scale_x_date(date_breaks = "3 months", date_labels = "%b %y") +
+      labs(title = "Artist on Top 100 Daily List in Country",
+           x = "Date",
+           col = "Track Name")
+    }
+    ggplotly(p)
   })
 }
 
