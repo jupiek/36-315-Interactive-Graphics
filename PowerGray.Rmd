@@ -112,19 +112,12 @@ data$Region = sapply(data$Country, country.to.continent)
 
 + Statistical summaries to get a sense of the data
 ```{r}
-# Summary statistics on top 200 streams, world wide
-streams = summary(data$Streams)
-# Summary statistics on top 200 streams, by country
-streams.by.country = ddply(data, .(Country), function(x) summary(x$Streams))
-# Summary statistics on top 200 streams, by continent
-streams.by.cont = ddply(data, .(Region), function(x) summary(x$Streams))
-
 # Total streams, world wide
 tot.streams = sum(as.numeric(data$Streams))
-# Summary statistics on top 200 streams, by country
+# Total streams, by country
 tot.streams.by.country = ddply(data, .(Country), 
                                function(x) sum(as.numeric(x$Streams)))
-# Summary statistics on top 200 streams, by continent
+# Total streams, by continent
 tot.streams.by.cont = ddply(data, .(Region), 
                             function(x) sum(as.numeric(x$Streams)))
 
@@ -224,13 +217,16 @@ shinyApp(
                      fill = "white") +
         geom_polygon(data = country.data, aes_string(x = "long", y = "lat", 
                                                      group = "group",
-                                                     fill = input$variable)) + 
-        scale_fill_gradient2(high = "brown", low = "purple", mid = "white") +
-        labs(title = "Top 200 ranking Spotify tracks worldwide",
+                                                     fill = input$variable)) +
+        scale_fill_distiller(palette = "Spectral") +
+        labs(title = "Top 30 ranking Spotify tracks worldwide",
              x = "", 
              y = "") +
-        theme(axis.text.x = element_blank(),
-              axis.text.y = element_blank())
+        theme(panel.background = element_rect(fill = "darkgrey"),
+              panel.grid.major = element_line(color = "darkgrey"),
+              axis.text.x = element_blank(),
+              axis.text.y = element_blank(),
+              axis.ticks = element_blank())
       
       if(input$variable == "Total_Streams") 
         rplot = rplot + labs(fill = "Number of Streams")
@@ -260,8 +256,8 @@ top15 = function(area, type) {
   flipped.cy = data.frame(t(cy[-1]))
   colnames(flipped.cy) = cy[, 1]
   
-  artists = rev(rownames(flipped.cy)[order(flipped.cy[,1], decreasing = TRUE)])
-  appearances = rev(flipped.cy[order(flipped.cy[,1], decreasing = TRUE),])
+  artists = rev(rownames(flipped.cy)[order(flipped.cy[,1], decreasing = TRUE)][1:15])
+  appearances = rev(flipped.cy[order(flipped.cy[,1], decreasing = TRUE),][1:15])
   
   return(data.frame(artists, appearances))
 }
@@ -743,7 +739,7 @@ shinyApp(
     #               summarise(n_daily = n()) %>%
     #               filter(n_daily >= 20) %>%
     #               select('Track.Name')
-    #   ed_20 <- ed_20 %>% collect %>% .[['Track.Name']]
+    #   ed_20 <- ed_20 %>% collect %>data % .[['Track.Name']]
     #   ed_sheeran_daily %>%
     #         filter(`Track Name` %in% ed_20)
     # })

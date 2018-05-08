@@ -12,7 +12,7 @@ library(scales)
 library(gridExtra)
 library(shinydashboard)
 
-load("shiny_ed_fullData.RData")
+load("test.RData")
 
 
 # SHINY APP CODE
@@ -166,12 +166,16 @@ server <- function(input, output, session) {
       geom_polygon(data = country.data, aes_string(x = "long", y = "lat", 
                                                    group = "group",
                                                    fill = input$variable)) + 
-      scale_fill_gradient2(high = "brown", low = "purple", mid = "white") +
-      labs(title = "Top 200 ranking Spotify tracks worldwide",
+      scale_fill_distiller(palette = "Spectral") +
+      
+      labs(title = "Top 30 ranking Spotify tracks worldwide",
            x = "", 
            y = "") +
-      theme(axis.text.x = element_blank(),
-            axis.text.y = element_blank())
+      theme(panel.background = element_rect(fill = "darkgrey"),
+            panel.grid.major = element_line(color = "darkgrey"),
+            axis.text.x = element_blank(),
+            axis.text.y = element_blank(),
+            axis.ticks = element_blank())
     
     if(input$variable == "Total_Streams") 
       rplot = rplot + labs(fill = "Number of Streams")
