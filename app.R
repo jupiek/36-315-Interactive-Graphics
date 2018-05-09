@@ -392,10 +392,10 @@ ui <- dashboardPage(
               p("A map overview of the countries that we have data for and
                 the amount of streams, tracks, and artists for those 
                 countries"),
-              p("We would expect that countries that have larger numbers of
+              p("Countries that have larger numbers of
                 artists and tracks have more variety in their top Spotify 
-                charts, while countries with smaller numbers tend to rate 
-                similar songs and artists "),
+                charts, while countries with smaller numbers tend listen to
+                similar songs and artists"),
               
               fluidPage(
                 inputPanel(
