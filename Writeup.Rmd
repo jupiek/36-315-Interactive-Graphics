@@ -54,7 +54,7 @@ Example Walkthrough
 
 Overview map graph - 
 
-Top songs (based on streams) - 
+Top songs (based on streams) - This graph is a bar chart showing the top songs of each region based on the number of streams. The user can select the region they would like to see as well as the number of top songs they would like to see. They can then compare the success of individual songs across different countries.
 
 Top songs (based on days in top 5) - This graph is a bar chart showing the 
 number of days that a song has been in the top 5. The user can select which 
@@ -65,7 +65,7 @@ on the region.
 
 Country vs region - 
 
-Streaming over time (by region) - 
+Streaming over time (by region) - We used a line chart with individual ploints plotted to show the trend of streams in a particular region over time. The user can select they region they would like to view as well as the size of the line, allowing them to smooth the graph. The user can then compare how different countries utilized the platform, and how specific events over the year might have affected the number of streams.
 
 Streaming over time (compare two countries) - 
 
@@ -85,7 +85,7 @@ Design Choices
 
 Overview map graph - 
 
-Top songs (based on streams) - 
+Top songs (based on streams) - We plotted the count of the streams of each song, so we used a bar chart. We wrapped the x axis text to make it more readable and added a slider to increase the number of songs the user can see. 
 
 Top songs (based on days in top 5) - As this graph only contained one variable,
 it was logical to use a bar chart to effectively show the data. We flipped the
@@ -94,7 +94,7 @@ overlap with each other.
 
 Country vs region - 
 
-Streaming over time (by region) - 
+Streaming over time (by region) - This goal of this graph was to plot the aggregate streams by each country to compare which country utilized the platform more over time. We added a slider to increase the size of the line to essentially smooth it, as many times the general trend was difficult to depict with the large number of points.
 
 Streaming over time (compare two countries) - 
 
