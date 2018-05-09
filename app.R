@@ -415,7 +415,8 @@ ui <- dashboardPage(
               p("A comparison of top 15 artists in selected country compared
                 with their respective region."),
               p("The purpose of this graphic is to investigate how much
-                countries tend to differentiate from their regions"),
+                countries tend to differentiate from their regions in music
+                ratings"),
               p("Top 15 artists are calculated by number of appearances on
                 the rankings database"),
               fluidPage(
