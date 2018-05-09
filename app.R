@@ -405,9 +405,9 @@ ui <- dashboardPage(
                                                "Number of Artists"),
                                choiceValues = c("Total_Streams", "N_Tracks", 
                                                 "N_Artists"))
-                  ),
+                ),
                 plotlyOutput("world_map")
-                  )
+              )
               ),
       
       # Second tab content
@@ -428,7 +428,7 @@ ui <- dashboardPage(
                 ),
                 plotOutput("cplot")
               )
-      ),
+              ),
       
       # Third tab content
       tabItem(tabName = "time_by_country",
@@ -519,7 +519,7 @@ ui <- dashboardPage(
               h2("Top Songs by Country"),
               p("On this page we can see the most popular songs for each region. 
                 You can choose the region of the world, as the nubmer of songs you want to see.
-                  "),
+                "),
               fluidPage(
                 inputPanel(
                   selectInput("region6", label = "Region",
@@ -531,7 +531,7 @@ ui <- dashboardPage(
                               min = 5, max = 50, value = 10, step = 5)),
                 plotOutput("top_songs")
               )
-      ),
+              ),
       
       # Seventh tab content
       tabItem(tabName = "time_by_region",
@@ -549,7 +549,7 @@ ui <- dashboardPage(
                               min = 1, max = 5, value = 2, step = 0.1)),
                 plotOutput("songs_time")
               )
-      ),
+              ),
       
       # Eighth tab content
       tabItem(tabName = "time_200_list",
@@ -647,7 +647,9 @@ server <- function(input, output, session) {
       geom_bar(stat = "identity", fill = "green4") +
       coord_flip() +
       labs(title = input$country,
-           x = "Artist", y = "Number of Appearances")
+           x = "Artist", y = "Number of Appearances") + 
+      scale_y_continuous(expand = c(0, 0)) + 
+      theme(axis.ticks.y = element_blank())
     
     cont = country.to.continent(input$country)
     ct = top15(cont, "cont")
@@ -657,7 +659,9 @@ server <- function(input, output, session) {
       geom_bar(stat = "identity", fill = "green4") +
       coord_flip() +
       labs(title = cont,
-           x = "Artist", y = "Number of Appearances")
+           x = "Artist", y = "Number of Appearances") +
+      scale_y_continuous(expand = c(0, 0)) + 
+      theme(axis.ticks.y = element_blank())
     
     p <- grid.arrange(grobs = list(rplot1, rplot2), nrow = 1,
                       top = "Top 15 Artists Spotify by Country\ncompared with region")
@@ -732,7 +736,9 @@ server <- function(input, output, session) {
       geom_bar(stat = "identity", fill = "green4") +
       labs(title = "Amount of Days Song has been in Top 5 Rankings in 2017",
            x = "Song Name", y = "Number of Days") + 
-      coord_flip()
+      coord_flip() +
+      scale_y_continuous(expand = c(0, 0)) + 
+      theme(axis.ticks.y = element_blank())
     
     p
   })
@@ -752,7 +758,10 @@ server <- function(input, output, session) {
                                                                             input$region5, ".grouped$Artist", sep = ""))) == input$artist5,],
                 aes(x = Track, y = Streams)) +
       geom_bar(aes(x = factor(1), fill = Track), stat = "identity",
-               width = .5) + scale_y_continuous(labels = comma)
+               width = .5) + scale_y_continuous(labels = comma) +
+      scale_y_continuous(expand = c(0, 0)) + 
+      theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank())
     ggplotly(p)
   })
   
@@ -771,10 +780,14 @@ server <- function(input, output, session) {
       labs(title = "Top Songs by Country",
            x = "Song",
            y = "Number of Streams")  + coord_flip()+
-      theme(axis.title.y = 
+      theme(axis.ticks.y = 
+              element_blank(),
+            axis.title.y = 
               element_text(margin = margin(r = 20)),
             axis.title.x =
-              element_text(margin = margin(t = 20)))
+              element_text(margin = margin(t = 20))) +
+      scale_y_continuous(expand = c(0, 0)) 
+      
   })
   
   # Graph 7
