@@ -46,7 +46,7 @@ and the country.
 
 Data Source: https://www.kaggle.com/edumucelli/spotifys-worldwide-daily-song-ranking
 
-Website: https://powergray.shinyapps.io/36-315-Interactive-Graphics/ 
+Shiny App Link: https://powergray.shinyapps.io/36-315-Interactive-Graphics/ 
 
 
 Example Walkthrough
