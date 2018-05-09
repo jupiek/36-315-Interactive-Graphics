@@ -39,10 +39,9 @@ listened songs in 53 countries from 2017 and 2018 by Spotify users. The original
 dataset contained more than 3 million rows, which comprised of 6629 artists and 
 18598 songs. However, this dataset was too large for us to deploy our 
 application on shinyapps, so we subsetted the data and used the Top 30 most 
-listened. Every row contains the song name, the position/ranking of the song, 
+listened, reducing the number of rows to 587,743. For each row, we are given 7 columns which contain the song name, the position/ranking of the song, 
 the artist, the number of streams, the URL, the date the data point was 
-recorded, and the region. We wrote additional code to add columns for the month 
-and the country.
+recorded, and the country (misleadingly named "region"). We wrote additional code to add columns for the month and the region in which the data was collected. 
 
 Data Source: https://www.kaggle.com/edumucelli/spotifys-worldwide-daily-song-ranking
 
@@ -52,7 +51,7 @@ Shiny App Link: https://powergray.shinyapps.io/36-315-Interactive-Graphics/
 Example Walkthrough
 ===
 
-Overview map graph - 
+Overview map graph - This graph is a world map that displays the countries for which we have data. All countries lacking data are colored white, while the countries relevant to our dataset are colored by the spectral color palette, according to their variable value. The variable options provided for the user to color countries by are "Number of Streams", "Number of Tracks", and "Number of Artists". Through this visual tool, they can compare how different countries and variables compare with each other in terms of color.
 
 Top songs (based on streams) - This graph is a bar chart showing the top songs of each region based on the number of streams. The user can select the region they would like to see as well as the number of top songs they would like to see. They can then compare the success of individual songs across different countries.
 
@@ -63,9 +62,9 @@ appear on the graph. With this, we can see a number of things such as how many
 days do the top songs stay at the top and whether this is different depending
 on the region. 
 
-Country vs region - 
+Country vs region - This graphic is a bar chart that shows the top 15 artists in the entire dataset, calculated by number of appearances. The chart on the left displays the top 15 for the country selected by the user, while the chart on the right displays the top 15 for the corresponding region. This graphic allows users to compare how top 15 songs of countries compare with the areas surrounding them.  
 
-Streaming over time (by region) - We used a line chart with individual ploints plotted to show the trend of streams in a particular region over time. The user can select they region they would like to view as well as the size of the line, allowing them to smooth the graph. The user can then compare how different countries utilized the platform, and how specific events over the year might have affected the number of streams.
+Streaming over time (by region) - We used a line chart with individual points plotted to show the trend of streams in a particular region over time. The user can select they region they would like to view as well as the size of the line, allowing them to smooth the graph. The user can then compare how different countries utilized the platform, and how specific events over the year might have affected the number of streams.
 
 Streaming over time (compare two countries) - 
 
@@ -116,7 +115,7 @@ multifaceted message or purpose while using graphs, interactions, and text to
 support and answer the questions we wanted to explore gave users more of
 an insight as to what we were doing and also allowed them to explore any
 questions that might have had as well. We also changed our application to load 
-all objects that we needed and pre-saved rather than process them everytime 
+all objects that we needed and pre-saved rather than process them every time 
 the application ran, speeding things up considerably. 
 
 For the graphs that previously took in textual input, we changed these to become
@@ -126,6 +125,5 @@ contained in the dataset. Doing this gives the user a much better experience so
 that they don't see 'No Results Found' all the time. We also added plotly to the
 time series plots so that users could examine the points more and could really 
 examine a specific time frame if they wanted. 
-
 
 
