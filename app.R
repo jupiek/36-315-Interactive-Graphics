@@ -832,8 +832,9 @@ server <- function(input, output, session) {
         labs(x = NULL, y = NULL)
     }
     else {
-      p <- ggplot(subData, aes(x = as.Date(Date), y = Position, col = `Track.Name`)) +
-        geom_point(alpha = 0.7, size = 3) +
+      subSubData <- subData[seq(1, nrow(subData), 2), ]
+      p <- ggplot(subSubData, aes(x = as.Date(Date), y = Position, col = `Track.Name`)) +
+        geom_point(alpha = 0.7, size = 1.5) +
         geom_line() +
         scale_y_reverse(breaks = seq(0, 100, 10)) +
         scale_x_date(date_breaks = "3 months", date_labels = "%b %y") +

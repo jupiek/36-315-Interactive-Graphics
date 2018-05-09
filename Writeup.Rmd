@@ -39,9 +39,12 @@ listened songs in 53 countries from 2017 and 2018 by Spotify users. The original
 dataset contained more than 3 million rows, which comprised of 6629 artists and 
 18598 songs. However, this dataset was too large for us to deploy our 
 application on shinyapps, so we subsetted the data and used the Top 30 most 
-listened, reducing the number of rows to 587,743. For each row, we are given 7 columns which contain the song name, the position/ranking of the song, 
+listened, reducing the number of rows to 587,743. For each row, we are given 7 
+columns which contain the song name, the position/ranking of the song, 
 the artist, the number of streams, the URL, the date the data point was 
-recorded, and the country (misleadingly named "region"). We wrote additional code to add columns for the month and the region in which the data was collected. 
+recorded, and the country (misleadingly named "region"). We wrote additional 
+code to add columns for the month and the region in which the data was 
+collected. 
 
 Data Source: https://www.kaggle.com/edumucelli/spotifys-worldwide-daily-song-ranking
 
@@ -51,9 +54,19 @@ Shiny App Link: https://powergray.shinyapps.io/36-315-Interactive-Graphics/
 Example Walkthrough
 ===
 
-Overview map graph - This graph is a world map that displays the countries for which we have data. All countries lacking data are colored white, while the countries relevant to our dataset are colored by the spectral color palette, according to their variable value. The variable options provided for the user to color countries by are "Number of Streams", "Number of Tracks", and "Number of Artists". Through this visual tool, they can compare how different countries and variables compare with each other in terms of color.
+Overview map graph - This graph is a world map that displays the countries for 
+which we have data. All countries lacking data are colored white, while the 
+countries relevant to our dataset are colored by the spectral color palette, 
+according to their variable value. The variable options provided for the user 
+to color countries by are "Number of Streams", "Number of Tracks", and "Number 
+of Artists". Through this visual tool, they can compare how different countries
+and variables compare with each other in terms of color.
 
-Top songs (based on streams) - This graph is a bar chart showing the top songs of each region based on the number of streams. The user can select the region they would like to see as well as the number of top songs they would like to see. They can then compare the success of individual songs across different countries.
+Top songs (based on streams) - This graph is a bar chart showing the top songs 
+of each region based on the number of streams. The user can select the region 
+they would like to see as well as the number of top songs they would like to 
+see. They can then compare the success of individual songs across different 
+countries.
 
 Top songs (based on days in top 5) - This graph is a bar chart showing the 
 number of days that a song has been in the top 5. The user can select which 
@@ -62,13 +75,34 @@ appear on the graph. With this, we can see a number of things such as how many
 days do the top songs stay at the top and whether this is different depending
 on the region. 
 
-Country vs region - This graphic is a bar chart that shows the top 15 artists in the entire dataset, calculated by number of appearances. The chart on the left displays the top 15 for the country selected by the user, while the chart on the right displays the top 15 for the corresponding region. This graphic allows users to compare how top 15 songs of countries compare with the areas surrounding them.  
+Country vs region - This graphic is a bar chart that shows the top 15 artists 
+in the entire dataset, calculated by number of appearances. The chart on the 
+left displays the top 15 for the country selected by the user, while the chart 
+on the right displays the top 15 for the corresponding region. This graphic 
+allows users to compare how top 15 songs of countries compare with the areas 
+surrounding them.  
 
-Streaming over time (by region) - We used a line chart with individual points plotted to show the trend of streams in a particular region over time. The user can select they region they would like to view as well as the size of the line, allowing them to smooth the graph. The user can then compare how different countries utilized the platform, and how specific events over the year might have affected the number of streams.
+Streaming over time (by region) - We used a line chart with individual points 
+plotted to show the trend of streams in a particular region over time. The user 
+can select they region they would like to view as well as the size of the line,
+allowing them to smooth the graph. The user can then compare how different 
+countries utilized the platform, and how specific events over the year might 
+have affected the number of streams.
 
-Streaming over time (compare two countries) - 
+Streaming over time (compare two countries) - We decided to use a timeseries
+plot to see how much songs were streamed in two different countries. What's
+interesting to note is how many songs fall off greatly in the United States,
+but in other countries like Canada, the song streaming count stays
+relatively the same, even though it starts at a much lower stream count to 
+begin with.
 
-Streaming over time (artist on top 200 daily list) - 
+Streaming over time (artist on top 200 daily list) - We decided to use a 
+timeseries plot to see how a songs ranking changed over time on the top 100
+list. You would expect as time went on, the song ranking would drop but this
+is not that case, even for the default selection of Ed Sheeran. His song
+"Perfect" starts high and then drops drastically, but then rises again and
+fluctuates greatly. Looking up different events or music video releases
+during specific dates may explain the changes in rank.
 
 Artist song proportions - Here we have a stacked bar chart that is filled with
 the amount of streams a particular song has. All the songs that appear belong
@@ -84,7 +118,9 @@ Design Choices
 
 Overview map graph - 
 
-Top songs (based on streams) - We plotted the count of the streams of each song, so we used a bar chart. We wrapped the x axis text to make it more readable and added a slider to increase the number of songs the user can see. 
+Top songs (based on streams) - We plotted the count of the streams of each song,
+so we used a bar chart. We wrapped the x axis text to make it more readable 
+and added a slider to increase the number of songs the user can see. 
 
 Top songs (based on days in top 5) - As this graph only contained one variable,
 it was logical to use a bar chart to effectively show the data. We flipped the
@@ -93,11 +129,25 @@ overlap with each other.
 
 Country vs region - 
 
-Streaming over time (by region) - This goal of this graph was to plot the aggregate streams by each country to compare which country utilized the platform more over time. We added a slider to increase the size of the line to essentially smooth it, as many times the general trend was difficult to depict with the large number of points.
+Streaming over time (by region) - This goal of this graph was to plot the 
+aggregate streams by each country to compare which country utilized the 
+platform more over time. We added a slider to increase the size of the line 
+to essentially smooth it, as many times the general trend was difficult to 
+depict with the large number of points.
 
-Streaming over time (compare two countries) - 
+Streaming over time (compare two countries) - The goal of this graph
+was just to show a time series and allow users to compare the differences
+in streaming count for a song between two countries. We wanted to keep
+the design simple, but also wanted to allow users to zoom in and examine
+specific time frames so we added plotly. 
 
-Streaming over time (artist on top 200 daily list) - 
+Streaming over time (artist on top 100 daily list) - The goal of this graph
+was to track how a song for an artists performed on the top 100 daily list
+and see how this changed over time. The graph could get cluttered, so we 
+plotted every second date and also chose to connect every point using a line
+since the disconnected dots made the ranking seem artbitrary whereas the 
+movement over time is the real focus of the graph, so we made the progression of
+each song a connected line. 
 
 Artist song proportions - We decided to use a stacked bar chart because we 
 believed it would show not only the proportions, but also the specific stream
