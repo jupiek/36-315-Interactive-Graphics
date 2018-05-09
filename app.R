@@ -603,6 +603,30 @@ server <- function(input, output, session) {
   
   # Graph 2
   output$cplot <- renderPlot({
+    country.to.continent = function(country) {
+      country = as.character(country)
+      if (country %in% asia) return("Asia")
+      if (country %in% europe) return("Europe")
+      if (country %in% northamerica) return("North America")
+      if (country %in% centralamerica) return("Central America")
+      if (country %in% southamerica) return("South America")
+      if (country %in% oceania) return("Oceania")
+      return(NA)
+    }
+    
+    top15 = function(area, type) {
+      if(type == "country") 
+        cy = artists.by.country[which(artists.by.country$Country == area),]
+      if(type == "cont") 
+        cy = artists.by.cont[which(artists.by.cont$Region == area),]
+      flipped.cy = data.frame(t(cy[-1]))
+      colnames(flipped.cy) = cy[, 1]
+      
+      artists = rev(rownames(flipped.cy)[order(flipped.cy[,1], decreasing = TRUE)][1:15])
+      appearances = rev(flipped.cy[order(flipped.cy[,1], decreasing = TRUE),][1:15])
+      
+      return(data.frame(artists, appearances))
+    }
     
     cy = top15(input$country, "country")
     cy$artists = factor(cy$artists, levels = cy$artists)
