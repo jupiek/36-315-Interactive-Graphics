@@ -623,7 +623,7 @@ server <- function(input, output, session) {
            x = "Artist", y = "Number of Appearances")
     
     p <- grid.arrange(grobs = list(rplot1, rplot2), nrow = 1,
-                      top = "Top 15 Artists Spotify by Country\ncompared with continent")
+                      top = "Top 15 Artists Spotify by Country\ncompared with region")
     print(p)
   })
   
