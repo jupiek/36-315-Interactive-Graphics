@@ -516,26 +516,37 @@ ui <- dashboardPage(
       
       # Sixth tab content
       tabItem(tabName = "top_song_stream",
+              h2("Top Songs by Country"),
+              p("On this page we can see the most popular songs for each region. 
+                You can choose the region of the world, as the nubmer of songs you want to see.
+                  "),
               fluidPage(
                 inputPanel(
                   selectInput("region6", label = "Region",
                               choices = c("North America", "South America",
                                           "Central America",
                                           "Asia", "Europe", "Oceania"),
-                              selected = "North America")),
+                              selected = "North America"),
+                  sliderInput("top_n2", label = "Top n songs for each country",
+                              min = 5, max = 50, value = 10, step = 5)),
                 plotOutput("top_songs")
               )
       ),
       
       # Seventh tab content
       tabItem(tabName = "time_by_region",
+              h2("Streaming Time by Region"),
+              p("On this page we can see overall streaming nubmers for each region. 
+                You can choose the region of the world, as well as the size of the line."),
               fluidPage(
                 inputPanel(
                   selectInput("region7", label = "Region",
                               choices = c("North America", "South America",
                                           "Central America",
                                           "Asia", "Europe", "Oceania"),
-                              selected = "North America")),
+                              selected = "North America"),
+                  sliderInput("size", label = "Line Size",
+                              min = 1, max = 5, value = 2, step = 0.1)),
                 plotOutput("songs_time")
               )
       ),
@@ -750,16 +761,17 @@ server <- function(input, output, session) {
   dataSub6 <- reactive({
     data.c = data[which(data$Region == input$region6),]
     data.c = data.c = aggregate(data.c$Streams, by=list(Name=data.c$Track.Name), FUN=sum)
-    head(arrange(data.c,desc(data.c$x)), 10)
+    head(arrange(data.c,desc(data.c$x)), input$top_n2)
   })
   output$top_songs <- renderPlot({
     ggplot(dataSub6(), aes(x = Name, y = x)) +
-      geom_bar(stat = 'identity') +
-      #scale_y_continuous(labels = comma) +
+      geom_bar(stat = 'identity', fill = "green4") +
+      scale_y_continuous(labels = comma) +
+      #scale_x_discrete(labels = function(Name) str_wrap(Name, width = 10)) + 
       labs(title = "Top Songs by Country",
            x = "Song",
-           y = "Number of Streams")  +
-      theme(axis.title.y =
+           y = "Number of Streams")  + coord_flip()+
+      theme(axis.title.y = 
               element_text(margin = margin(r = 20)),
             axis.title.x =
               element_text(margin = margin(t = 20)))
@@ -771,12 +783,13 @@ server <- function(input, output, session) {
     aggregate(data.d$Streams, by=list(Category=data.d$Date), FUN=sum)
   })
   output$songs_time <- renderPlot({
-    ggplot(dataSub7(), aes(x = as.Date(Category), y = x)) + geom_point() +
-      geom_line() +
-      labs(title = "Song Streams by Region Over Time",
+    ggplot(dataSub7(), aes(x = as.Date(Category), y = x)) + geom_point(colour= "green4") +
+      geom_line(colour= "green4", size = input$size) +
+      scale_y_continuous(labels = comma) +
+      labs(title = "Song Streams by Country Over Time",
            x = "Date",
-           y = "Number of Streams") +
-      theme(axis.title.y =
+           y = "Number of Streams") + 
+      theme(axis.title.y = 
               element_text(margin = margin(r = 20)),
             axis.title.x =
               element_text(margin = margin(t = 20)))
