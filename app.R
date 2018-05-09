@@ -412,6 +412,7 @@ ui <- dashboardPage(
       
       # Second tab content
       tabItem(tabName = "country_v_region",
+              h2("Top 15 Artists: Country vs. Region"),
               p("A comparison of top 15 artists in selected country compared
                 with their respective region."),
               p("The purpose of this graphic is to investigate how much
@@ -632,7 +633,7 @@ server <- function(input, output, session) {
     cy$artists = factor(cy$artists, levels = cy$artists)
     
     rplot1 = ggplot(cy, aes(x = artists, y = appearances)) +
-      geom_bar(stat = "identity", fill = "lightcoral") +
+      geom_bar(stat = "identity", fill = "green4") +
       coord_flip() +
       labs(title = input$country,
            x = "Artist", y = "Number of Appearances")
@@ -642,7 +643,7 @@ server <- function(input, output, session) {
     ct$artists = factor(ct$artists, levels = ct$artists)
     
     rplot2 = ggplot(ct, aes(x = artists, y = appearances)) +
-      geom_bar(stat = "identity", fill = "lightcoral") +
+      geom_bar(stat = "identity", fill = "green4") +
       coord_flip() +
       labs(title = cont,
            x = "Artist", y = "Number of Appearances")
@@ -717,7 +718,7 @@ server <- function(input, output, session) {
   output$top_songs_plot <- renderPlot({
     p <- ggplot(eval(parse(text = paste("cum.table$", "'", input$region, "'",
                                         sep = "")))[1:input$top_n,], aes(x = Track.Name, y = freq)) +
-      geom_bar(stat = "identity", fill = "green") +
+      geom_bar(stat = "identity", fill = "green4") +
       labs(title = "Amount of Days Song has been in Top 5 Rankings in 2017",
            x = "Song Name", y = "Number of Days") + 
       coord_flip()
