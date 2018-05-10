@@ -760,7 +760,6 @@ server <- function(input, output, session) {
                 aes(x = Track, y = Streams)) +
       geom_bar(aes(x = factor(1), fill = Track), stat = "identity",
                width = .5) + scale_y_continuous(labels = comma) +
-      scale_y_continuous(expand = c(0, 0)) + 
       theme(axis.ticks.x = element_blank(),
             axis.text.x = element_blank())
     ggplotly(p)
