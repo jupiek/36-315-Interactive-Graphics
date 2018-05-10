@@ -116,7 +116,7 @@ us to see specifically which of his songs comprise of the most streams.
 Design Choices
 ===
 
-Overview map graph - 
+Overview map graph - To visualize the areas that our data focuses on, we decided to load in geological coordinates to create a world map. In order to differentiate the regions for which we have data, we decided to color all regions lacking data in white, and choose a color spectrum that does not contain white. The background panel was colored dark grey, again to differentiate easily from other areas on the graph, and all components of the axes were set as `element_blank()`. 
 
 Top songs (based on streams) - We plotted the count of the streams of each song,
 so we used a bar chart. We wrapped the x axis text to make it more readable 
@@ -127,7 +127,7 @@ it was logical to use a bar chart to effectively show the data. We flipped the
 x and y axis so that the bars were horizontal so that the song name's would not
 overlap with each other. 
 
-Country vs region - 
+Country vs region - The goal of this graph was to compare top 15 artists by number of artists, a single quantitative variable. We chose to use a bar graph in doing this, converting the graphic to be horizontal in order to make the artist names easier to read and decrease overlap. We also ordered the data in decreasing order for ease in determining the order of top artists. 
 
 Streaming over time (by region) - This goal of this graph was to plot the 
 aggregate streams by each country to compare which country utilized the 
@@ -145,7 +145,7 @@ Streaming over time (artist on top 100 daily list) - The goal of this graph
 was to track how a song for an artists performed on the top 100 daily list
 and see how this changed over time. The graph could get cluttered, so we 
 plotted every second date and also chose to connect every point using a line
-since the disconnected dots made the ranking seem artbitrary whereas the 
+since the disconnected dots made the ranking seem arbitrary whereas the 
 movement over time is the real focus of the graph, so we made the progression of
 each song a connected line. 
 
@@ -175,5 +175,4 @@ contained in the dataset. Doing this gives the user a much better experience so
 that they don't see 'No Results Found' all the time. We also added plotly to the
 time series plots so that users could examine the points more and could really 
 examine a specific time frame if they wanted. 
-
 
