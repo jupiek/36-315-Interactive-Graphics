@@ -674,7 +674,7 @@ server <- function(input, output, session) {
     selectInput(
       inputId = "artistTime", 
       label = "Artist: ",
-      choices = artists,
+      choices = sort(unique(data$Artist)),
       selected = "Post Malone")
   })
   
@@ -686,19 +686,20 @@ server <- function(input, output, session) {
       label = "Song: ",
       choices = available,
       selected = available[1])
-    
   })
   
   dataSub <- reactive({
-    if (input$songTime == "") {
-      chosenSong <- " "
+    if (is.null(input$songTime)) {
+      subset(data, Track.Name == 'rockstar' & 
+               Artist == input$artistTime &
+               (Country == input$country1 | Country == input$country2))
     }
     else {
       chosenSong <- input$songTime
+      subset(data, Track.Name == chosenSong &
+               Artist == input$artistTime &
+               (Country == input$country1 | Country == input$country2))
     }
-    subset(data, Track.Name == chosenSong &
-             Artist == input$artistTime &
-             (Country == input$country1 | Country == input$country2))
   })
   
   output$streams_over_time <- renderPlotly({
