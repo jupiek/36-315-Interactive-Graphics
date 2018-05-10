@@ -423,7 +423,7 @@ ui <- dashboardPage(
               fluidPage(
                 inputPanel(
                   selectInput("country", label = "Country:",
-                              choices = sort(names(countries)), 
+                              choices = sort(names(countries)[countries != "global"]), 
                               selected = "Asia")
                 ),
                 plotOutput("cplot")
@@ -788,7 +788,7 @@ server <- function(input, output, session) {
             axis.title.x =
               element_text(margin = margin(t = 20))) +
       scale_y_continuous(expand = c(0, 0)) 
-      
+    
   })
   
   # Graph 7
